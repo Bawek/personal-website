@@ -69,5 +69,4 @@ const About = () => {
 
     )
 }
-git add.
-export default About
+export default About;
