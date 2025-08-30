@@ -29,7 +29,7 @@ const About = () => {
                     >
                         <p className='py-2 text-gray-600'>
 
-                            I am a Frontend Developer {" who's "} passionate & ethusiastic about creating web application. I am into web developement from past 2 years and I have experience working on serveral real world end-to-end project
+                            I am a Software Engineer {" who's "} passionate & ethusiastic about creating web application. I am into web developement from past years and I have experience working on serveral real world end-to-end project
                             using HTML, CSS, Javascript, React JS, Redux,  Web3.js ,React Context API .
 
                         </p>
