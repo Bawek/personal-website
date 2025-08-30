@@ -46,7 +46,7 @@ const Hero = () => {
                                 />
                             </h2>
 
-                            {/* <h2 className='text-gray-600  py-3'>Frontend Developer</h2> */}
+                            {/* <h2 className='text-gray-600  py-3'>Software Engineer</h2> */}
                             <div className='flex justify-between items-center m-auto max-w-[280px] py-5'>
 
                                 <div className='rounded-full shadow-lg shadow-gray-400 p-5 cursor-pointer hover:scale-110 ease-in duration-300'>
