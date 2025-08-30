@@ -32,7 +32,7 @@ const Hero = () => {
 
                                         typewriter
 
-                                            .typeString("A Frontend Developer")
+                                            .typeString("A Software Engineer")
 
                                             .pauseFor(1000)
                                             .deleteAll()
