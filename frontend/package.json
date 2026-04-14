@@ -1,0 +1,37 @@
+{
+  "name": "nextjs-portfoliosite",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "export": "next export",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.11.1",
+    "@emotion/styled": "^11.11.0",
+    "@mui/material": "^5.14.18",
+    "@next/font": "^13.5.4",
+    "axios": "^1.6.2",
+    "emailjs-com": "^3.2.0",
+    "eslint": "^8.54.0",
+    "eslint-config-next": "^13.5.4",
+    "firebase": "^10.6.0",
+    "framer-motion": "^10.16.4",
+    "next": "^13.5.4",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-icons": "^4.12.0",
+    "react-tsparticles": "^2.12.0",
+    "react-typed": "^2.0.12",
+    "tsparticles": "^2.12.0",
+    "typewriter-effect": "^2.21.0"
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.31",
+    "tailwindcss": "^3.3.5"
+  }
+}
