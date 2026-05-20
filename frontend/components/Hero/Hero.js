@@ -3,6 +3,7 @@ import { AiOutlineMail } from 'react-icons/ai'
 import { HiArrowDown } from 'react-icons/hi'
 import { motion } from 'framer-motion'
 import Typewriter from 'typewriter-effect'
+import Link from 'next/link'
 
 const SOCIAL_LINKS = [
   {
@@ -111,12 +112,12 @@ export default function Hero({ content }) {
 
         {/* CTA buttons */}
         <motion.div variants={item} className="flex flex-wrap items-center justify-center gap-4 mb-12">
-          <a href="/#projects" className="btn-primary">
+          <Link href="/projects" className="btn-primary">
             View My Work
-          </a>
-          <a href="/#contact" className="btn-ghost">
+          </Link>
+          <Link href="/contact" className="btn-ghost">
             Get In Touch
-          </a>
+          </Link>
         </motion.div>
 
         {/* Social links */}
@@ -137,22 +138,23 @@ export default function Hero({ content }) {
       </motion.div>
 
       {/* Scroll indicator */}
-      <motion.a
-        href="/#about"
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 1.2 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500 hover:text-violet-400 transition-colors"
-        aria-label="Scroll to About"
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500 hover:text-violet-400 transition-colors cursor-pointer"
+        aria-label="Learn more about me"
       >
-        <span className="text-xs font-mono tracking-widest uppercase">Scroll</span>
-        <motion.div
-          animate={{ y: [0, 6, 0] }}
-          transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
-        >
-          <HiArrowDown size={16} />
-        </motion.div>
-      </motion.a>
+        <Link href="/about" className="flex flex-col items-center gap-2 text-gray-500 hover:text-violet-400 transition-colors">
+          <span className="text-xs font-mono tracking-widest uppercase">Learn More</span>
+          <motion.div
+            animate={{ y: [0, 6, 0] }}
+            transition={{ repeat: Infinity, duration: 1.5, ease: 'easeInOut' }}
+          >
+            <HiArrowDown size={16} />
+          </motion.div>
+        </Link>
+      </motion.div>
     </section>
   )
 }

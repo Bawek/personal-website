@@ -57,10 +57,10 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/projects/:id - Get a single project (public)
-router.get('/:id', async (req, res) => {
+// GET /api/projects/:slug - Get a single project by slug (public)
+router.get('/:slug', async (req, res) => {
   try {
-    const project = await Project.findById(req.params.id);
+    const project = await Project.findOne({ slug: req.params.slug });
     
     if (!project) {
       return res.status(404).json({
@@ -74,7 +74,7 @@ router.get('/:id', async (req, res) => {
       project: project
     });
   } catch (error) {
-    console.error('Error fetching project:', error);
+    console.error('Error fetching project by slug:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch project'
@@ -128,11 +128,11 @@ router.post('/', authenticate, upload.single('image'), async (req, res) => {
   }
 });
 
-// PUT /api/projects/:id - Update a project
-router.put('/:id', authenticate, upload.single('image'), async (req, res) => {
+// PUT /api/projects/:slug - Update a project by slug
+router.put('/:slug', authenticate, upload.single('image'), async (req, res) => {
   try {
     const project = await Project.findOne({ 
-      _id: req.params.id, 
+      slug: req.params.slug, 
       createdBy: req.user.id 
     });
     
@@ -192,11 +192,11 @@ router.put('/:id', authenticate, upload.single('image'), async (req, res) => {
   }
 });
 
-// PATCH /api/projects/:id/toggle-featured - Toggle featured status
-router.patch('/:id/toggle-featured', authenticate, async (req, res) => {
+// PATCH /api/projects/:slug/toggle-featured - Toggle featured status by slug
+router.patch('/:slug/toggle-featured', authenticate, async (req, res) => {
   try {
     const project = await Project.findOne({ 
-      _id: req.params.id, 
+      slug: req.params.slug, 
       createdBy: req.user.id 
     });
     
@@ -224,11 +224,11 @@ router.patch('/:id/toggle-featured', authenticate, async (req, res) => {
   }
 });
 
-// DELETE /api/projects/:id - Delete a project
-router.delete('/:id', authenticate, async (req, res) => {
+// DELETE /api/projects/:slug - Delete a project by slug
+router.delete('/:slug', authenticate, async (req, res) => {
   try {
     const project = await Project.findOne({ 
-      _id: req.params.id, 
+      slug: req.params.slug, 
       createdBy: req.user.id 
     });
     
@@ -249,7 +249,7 @@ router.delete('/:id', authenticate, async (req, res) => {
       }
     }
     
-    await Project.deleteOne({ _id: req.params.id });
+    await Project.deleteOne({ slug: req.params.slug });
     
     res.json({
       success: true,

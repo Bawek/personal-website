@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa'
 import { HiStar } from 'react-icons/hi'
@@ -10,6 +11,7 @@ export default function ProjectItem({
   desc,
   sourceLink,
   featured,
+  slug,
 }) {
   const isDynamic = typeof backgroundImg === 'string' && backgroundImg?.includes('/uploads/')
   const hasImage  = !!backgroundImg
@@ -22,8 +24,8 @@ export default function ProjectItem({
       transition={{ duration: 0.5 }}
       className="glass-card overflow-hidden flex flex-col group hover:border-violet-500/40 transition-all duration-300"
     >
-      {/* Image */}
-      <div className="relative h-48 bg-surface-2 overflow-hidden flex-shrink-0">
+      {/* Image with link */}
+      <Link href={`/projects/${slug}`} className="relative h-48 bg-surface-2 overflow-hidden flex-shrink-0 block">
         {hasImage ? (
           isDynamic ? (
             <img
@@ -56,11 +58,13 @@ export default function ProjectItem({
 
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-      </div>
+      </Link>
 
       {/* Content */}
       <div className="flex flex-col flex-1 p-5">
-        <h3 className="text-white mb-2 text-lg">{title}</h3>
+        <Link href={`/projects/${slug}`} className="block">
+          <h3 className="text-white mb-2 text-lg hover:text-violet-400 transition-colors">{title}</h3>
+        </Link>
 
         {desc && (
           <p className="text-gray-400 text-sm leading-relaxed mb-4 flex-1 line-clamp-3">

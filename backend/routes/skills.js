@@ -23,10 +23,10 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/skills/:id - Get a single skill (public)
-router.get('/:id', async (req, res) => {
+// GET /api/skills/:slug - Get a single skill by slug (public)
+router.get('/:slug', async (req, res) => {
   try {
-    const skill = await Skill.findById(req.params.id);
+    const skill = await Skill.findOne({ slug: req.params.slug });
     
     if (!skill) {
       return res.status(404).json({
@@ -40,7 +40,7 @@ router.get('/:id', async (req, res) => {
       skill: skill
     });
   } catch (error) {
-    console.error('Error fetching skill:', error);
+    console.error('Error fetching skill by slug:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch skill'
@@ -89,11 +89,11 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-// PUT /api/skills/:id - Update a skill
-router.put('/:id', authenticate, async (req, res) => {
+// PUT /api/skills/:slug - Update a skill by slug
+router.put('/:slug', authenticate, async (req, res) => {
   try {
     const skill = await Skill.findOne({ 
-      _id: req.params.id, 
+      slug: req.params.slug, 
       createdBy: req.user.id 
     });
     
@@ -111,7 +111,7 @@ router.put('/:id', authenticate, async (req, res) => {
       const existingSkill = await Skill.findOne({ 
         name: name, 
         createdBy: req.user.id,
-        _id: { $ne: req.params.id }
+        slug: { $ne: req.params.slug }
       });
       
       if (existingSkill) {
@@ -142,11 +142,11 @@ router.put('/:id', authenticate, async (req, res) => {
   }
 });
 
-// DELETE /api/skills/:id - Delete a skill
-router.delete('/:id', authenticate, async (req, res) => {
+// DELETE /api/skills/:slug - Delete a skill by slug
+router.delete('/:slug', authenticate, async (req, res) => {
   try {
     const skill = await Skill.findOne({ 
-      _id: req.params.id, 
+      slug: req.params.slug, 
       createdBy: req.user.id 
     });
     
@@ -157,7 +157,7 @@ router.delete('/:id', authenticate, async (req, res) => {
       });
     }
     
-    await Skill.deleteOne({ _id: req.params.id });
+    await Skill.deleteOne({ slug: req.params.slug });
     
     res.json({
       success: true,

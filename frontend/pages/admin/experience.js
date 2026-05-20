@@ -45,16 +45,16 @@ function ExperienceContent() {
     e.preventDefault(); setSaving(true); setError('')
     try {
       const payload = { ...form, responsibilities: form.responsibilities.split('\n').filter(Boolean), achievements: form.achievements.split('\n').filter(Boolean), technologies: form.technologies.split(',').map(t => t.trim()).filter(Boolean) }
-      if (editing) await axios.put(`/api/experience/${editing._id}`, payload, { headers: headers() })
+      if (editing) await axios.put(`/api/experience/${editing.slug}`, payload, { headers: headers() })
       else         await axios.post('/api/experience', payload, { headers: headers() })
       await fetchExp(); closeForm()
     } catch (err) { setError(err.response?.data?.message || 'Failed to save') }
     finally { setSaving(false) }
   }
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (slug) => {
     if (!confirm('Delete this experience?')) return
-    try { await axios.delete(`/api/experience/${id}`, { headers: headers() }); await fetchExp() }
+    try { await axios.delete(`/api/experience/${slug}`, { headers: headers() }); await fetchExp() }
     catch { setError('Failed to delete') }
   }
 
@@ -183,7 +183,7 @@ function ExperienceContent() {
                 </div>
                 <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
                   <button onClick={() => openEdit(exp)} className="p-1.5 rounded-lg text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 transition-all" aria-label="Edit"><HiPencil size={14} /></button>
-                  <button onClick={() => handleDelete(exp._id)} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all" aria-label="Delete"><HiTrash size={14} /></button>
+                  <button onClick={() => handleDelete(exp.slug)} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all" aria-label="Delete"><HiTrash size={14} /></button>
                 </div>
               </div>
             </motion.div>

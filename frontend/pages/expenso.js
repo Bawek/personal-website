@@ -129,7 +129,7 @@ const Expenso = () => {
                 </motion.div>
                 <motion.div initial={{ opacity: 0 }}
                     whileInView={{ y: [-50, 0], opacity: 1 }}>
-                    <Link href='/#projects'>
+                    <Link href='/projects'>
                         <p className='underline cursor-pointer'>Back</p>
                     </Link>
                 </motion.div>

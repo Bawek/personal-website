@@ -6,6 +6,7 @@ import ProjectItem from './ProjectItem'
 const FALLBACK_PROJECTS = [
   {
     _id: '1',
+    slug: 'ecommerce-application',
     title: 'Ecommerce Application',
     description: 'A full-stack ecommerce app where users can browse and purchase products with authentication.',
     techStack: ['React', 'Context API', 'Express', 'Tailwind'],
@@ -15,6 +16,7 @@ const FALLBACK_PROJECTS = [
   },
   {
     _id: '2',
+    slug: 'blog-app',
     title: 'Blog App',
     description: 'A full-featured blog platform enabling users to create, manage, and read posts with Google Auth.',
     techStack: ['React', 'Redux', 'MongoDB', 'Express'],
@@ -24,6 +26,7 @@ const FALLBACK_PROJECTS = [
   },
   {
     _id: '3',
+    slug: 'user-management-system',
     title: 'User Management System',
     description: 'Admin dashboard for managing users, roles, and permissions with secure authentication.',
     techStack: ['React', 'Redux/Thunk', 'Express', 'MongoDB'],
@@ -33,6 +36,7 @@ const FALLBACK_PROJECTS = [
   },
   {
     _id: '4',
+    slug: 'mail-box-client',
     title: 'Mail-Box Client',
     description: 'Email client where users can compose, send, and manage received and unread mail in real-time.',
     techStack: ['React', 'Redux', 'Firebase', 'Tailwind'],
@@ -69,6 +73,7 @@ export default function Projects({ projects }) {
           {displayed.map((project) => (
             <ProjectItem
               key={project._id}
+              slug={project.slug}
               title={project.title}
               projectUrl={project.liveUrl || '#'}
               backgroundImg={project.imageUrl || null}
