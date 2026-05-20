@@ -1,85 +1,101 @@
-import React from 'react'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 import ProjectItem from './ProjectItem'
-import mingoImg from '../../public/assets/mingo.png'
-import blinkImg from '../../public/assets/store.png'
-import expensoImg from '../../public/assets/expenso.png'
-import mailImg from '../../public/assets/mail.png'
-import { motion } from 'framer-motion';
 
-const Projects = ({ projects }) => {
-    return (
-        <div id='projects' className='w-full'>
-            <div className='max-w-[1240px] mx-auto px-2 py-16'>
-                <motion.div
-                    initial={{ x: 0, opacity: 0 }}
-                    whileInView={{ x: [-250, 0], opacity: 1 }}
-                    transition={{ duration: 1 }}
-                >
-                    <p className='text-xl tracking-widest uppercase font-bold-200 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-                        Projects
-                    </p>
-                    <h2 className='py-4'>What I&apos;ve Built</h2>
-                </motion.div>
+// Fallback projects when no DB data
+const FALLBACK_PROJECTS = [
+  {
+    _id: '1',
+    title: 'Ecommerce Application',
+    description: 'A full-stack ecommerce app where users can browse and purchase products with authentication.',
+    techStack: ['React', 'Context API', 'Express', 'Tailwind'],
+    liveUrl: '#',
+    githubUrl: 'https://github.com/Bawek/ECOMMERCE-APP/',
+    featured: true,
+  },
+  {
+    _id: '2',
+    title: 'Blog App',
+    description: 'A full-featured blog platform enabling users to create, manage, and read posts with Google Auth.',
+    techStack: ['React', 'Redux', 'MongoDB', 'Express'],
+    liveUrl: '#',
+    githubUrl: 'https://github.com/Bawek/Blog-App',
+    featured: false,
+  },
+  {
+    _id: '3',
+    title: 'User Management System',
+    description: 'Admin dashboard for managing users, roles, and permissions with secure authentication.',
+    techStack: ['React', 'Redux/Thunk', 'Express', 'MongoDB'],
+    liveUrl: '#',
+    githubUrl: 'https://github.com/Bawek/UserManegmentSyStem',
+    featured: false,
+  },
+  {
+    _id: '4',
+    title: 'Mail-Box Client',
+    description: 'Email client where users can compose, send, and manage received and unread mail in real-time.',
+    techStack: ['React', 'Redux', 'Firebase', 'Tailwind'],
+    liveUrl: '#',
+    githubUrl: 'https://github.com/Bawek/MERN',
+    featured: false,
+  },
+]
 
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    whileInView={{ y: [-50, 0], opacity: 1 }}
-                    className='grid md:grid-cols-2 gap-8'>
-                    
-                    {projects && projects.length > 0 ? (
-                        projects.map((project) => (
-                            <ProjectItem
-                                key={project._id}
-                                title={project.title}
-                                projectUrl={project.liveUrl || '#'}
-                                backgroundImg={project.imageUrl || blinkImg}
-                                desc={project.description}
-                                tech={project.techStack.join(', ')}
-                                sourceLink={project.githubUrl || '#'}
-                                featured={project.featured}
-                            />
-                        ))
-                    ) : (
-                        // Fallback to default projects if no data
-                        <>
-                            <ProjectItem
-                                title='Ecommerce Application'
-                                projectUrl='/blink-it'
-                                backgroundImg={blinkImg}
-                                desc='c where users can buy blackpink products.'
-                                tech='React JS, React Context API, Rest Authentication,express,tailwind.'
-                                sourceLink='https://github.com/Bawek/ECOMMERCE-APP/'
-                            />
-                            <ProjectItem
-                                title='Blog App'
-                                projectUrl='/mingo'
-                                backgroundImg={mingoImg}
-                                desc='A Blog App is a web application that enables users to create, manage, and read blog posts. It provides a platform for writers to share their thoughts, articles, tutorials, or any form of content in a structured and user-friendly format.'
-                                tech='React JS, Redux, tailwind ,mongodb database, Google Authentication & express.'
-                                sourceLink='https://github.com/Bawek/Blog-App'
-                            />
-                            <ProjectItem
-                                title='UMS'
-                                projectUrl='/expenso'
-                                backgroundImg={expensoImg}
-                                desc='User Management System (UMS) is a software application designed to manage users, their roles, and permissions within a digital platform or organization. It allows administrators to control who can access the system, what actions they can perform, and ensures secure authentication and authorization of users.'
-                                tech='React Js , Redux/Thunk,Express , MongoDb Database and tailwind.'
-                                sourceLink='https://github.com/Bawek/UserManegmentSyStem'
-                            />
-                            <ProjectItem
-                                title='Mail-Box Client'
-                                projectUrl='/mailbox-client'
-                                backgroundImg={mailImg}
-                                desc='In mailbox client users can compose mail to anyone, view all received, sent & unread mail.'
-                                tech='React, Redux, Custom Hooks, , Real-time database, Tailwind , Exspress.'
-                                sourceLink='https://github.com/Bawek/MERN'
-                            />
-                        </>
-                    )}
-                </motion.div>
-            </div>
+export default function Projects({ projects }) {
+  const data = projects?.length ? projects : FALLBACK_PROJECTS
+  const [showAll, setShowAll] = useState(false)
+
+  const displayed = showAll ? data : data.slice(0, 6)
+
+  return (
+    <section id="projects" className="py-24">
+      <div className="section-wrapper">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-12"
+        >
+          <p className="section-label mb-3">Portfolio</p>
+          <h2 className="text-gray-100">What I&apos;ve Built</h2>
+          <p className="text-gray-400 mt-3 max-w-xl">
+            A selection of projects I&apos;ve worked on — from full-stack apps to UI experiments.
+          </p>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {displayed.map((project) => (
+            <ProjectItem
+              key={project._id}
+              title={project.title}
+              projectUrl={project.liveUrl || '#'}
+              backgroundImg={project.imageUrl || null}
+              desc={project.description}
+              tech={(project.techStack || []).join(', ')}
+              sourceLink={project.githubUrl || '#'}
+              featured={project.featured}
+            />
+          ))}
         </div>
-    )
-}
 
-export default Projects
+        {data.length > 6 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            className="flex justify-center mt-10"
+          >
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="btn-ghost"
+            >
+              {showAll ? 'Show Less' : `Show All ${data.length} Projects`}
+            </button>
+          </motion.div>
+        )}
+      </div>
+    </section>
+  )
+}

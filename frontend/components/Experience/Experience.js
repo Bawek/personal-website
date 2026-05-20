@@ -1,156 +1,148 @@
-import { motion } from 'framer-motion';
-import { useState } from 'react';
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
+import { HiLocationMarker, HiChevronDown, HiChevronUp } from 'react-icons/hi'
 
-const Experience = ({ experience }) => {
-  const [expandedItem, setExpandedItem] = useState(null);
+const TYPE_COLORS = {
+  'full-time':  'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  'part-time':  'bg-blue-500/10    text-blue-400    border-blue-500/20',
+  'contract':   'bg-violet-500/10  text-violet-400  border-violet-500/20',
+  'internship': 'bg-amber-500/10   text-amber-400   border-amber-500/20',
+  'freelance':  'bg-pink-500/10    text-pink-400    border-pink-500/20',
+}
 
-  const formatDate = (dateString) => {
-    if (!dateString) return 'Present';
-    return new Date(dateString).toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'short' 
-    });
-  };
+function formatDate(dateStr) {
+  if (!dateStr) return 'Present'
+  return new Date(dateStr).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
+}
 
-  const getEmploymentTypeColor = (type) => {
-    switch (type) {
-      case 'full-time': return 'bg-green-100 text-green-800';
-      case 'part-time': return 'bg-blue-100 text-blue-800';
-      case 'contract': return 'bg-purple-100 text-purple-800';
-      case 'internship': return 'bg-yellow-100 text-yellow-800';
-      case 'freelance': return 'bg-pink-100 text-pink-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
-  const toggleExpanded = (id) => {
-    setExpandedItem(expandedItem === id ? null : id);
-  };
-
-  if (!experience || experience.length === 0) {
-    return (
-      <section className="py-20 bg-gray-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">Experience</h2>
-            <p className="text-gray-600">No experience added yet.</p>
-          </div>
-        </div>
-      </section>
-    );
-  }
+function ExperienceCard({ exp, index }) {
+  const [expanded, setExpanded] = useState(false)
+  const typeClass = TYPE_COLORS[exp.employmentType] || 'bg-gray-500/10 text-gray-400 border-gray-500/20'
+  const hasMore = exp.responsibilities?.length > 3
 
   return (
-    <section className="py-20 bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5, delay: index * 0.08 }}
+      className="relative pl-8 pb-10 last:pb-0"
+    >
+      {/* Timeline line */}
+      <div
+        className="absolute left-0 top-2 bottom-0 w-px bg-gradient-to-b from-violet-500/60 to-transparent"
+        aria-hidden="true"
+      />
+      {/* Timeline dot */}
+      <div
+        className="absolute left-[-5px] top-2 w-[11px] h-[11px] rounded-full border-2 border-violet-500 bg-bg"
+        aria-hidden="true"
+      />
+
+      <div className="glass-card p-6 hover:border-violet-500/30 transition-colors duration-300">
+        {/* Header */}
+        <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
+          <div>
+            <div className="flex flex-wrap items-center gap-2 mb-1">
+              <h3 className="text-white">{exp.title}</h3>
+              {exp.current && (
+                <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
+                  Current
+                </span>
+              )}
+            </div>
+            <p className="text-violet-300 font-medium">{exp.company}</p>
+          </div>
+
+          <div className="flex flex-col items-end gap-1.5 flex-shrink-0">
+            <span className={`px-2.5 py-0.5 text-xs rounded-full border font-mono capitalize ${typeClass}`}>
+              {exp.employmentType?.replace('-', ' ')}
+            </span>
+            <span className="text-xs text-gray-500 font-mono">
+              {formatDate(exp.startDate)} — {formatDate(exp.endDate)}
+            </span>
+          </div>
+        </div>
+
+        {/* Location */}
+        {exp.location && (
+          <p className="flex items-center gap-1.5 text-sm text-gray-500 mb-3">
+            <HiLocationMarker size={14} aria-hidden="true" />
+            {exp.location}
+          </p>
+        )}
+
+        {/* Description */}
+        {exp.description && (
+          <p className="text-gray-400 text-sm leading-relaxed mb-4">{exp.description}</p>
+        )}
+
+        {/* Responsibilities */}
+        {exp.responsibilities?.length > 0 && (
+          <div className="mb-4">
+            <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-2">Responsibilities</p>
+            <ul className="space-y-1.5">
+              {exp.responsibilities
+                .slice(0, expanded ? undefined : 3)
+                .map((r, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-gray-400">
+                    <span className="text-violet-500 mt-1 flex-shrink-0" aria-hidden="true">▸</span>
+                    {r}
+                  </li>
+                ))}
+            </ul>
+            {hasMore && (
+              <button
+                onClick={() => setExpanded(!expanded)}
+                className="mt-2 flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 transition-colors font-mono"
+                aria-expanded={expanded}
+              >
+                {expanded ? (
+                  <><HiChevronUp size={14} /> Show less</>
+                ) : (
+                  <><HiChevronDown size={14} /> {exp.responsibilities.length - 3} more</>
+                )}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Technologies */}
+        {exp.technologies?.length > 0 && (
+          <div className="flex flex-wrap gap-2">
+            {exp.technologies.map((tech, i) => (
+              <span key={i} className="tech-badge">{tech}</span>
+            ))}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+export default function Experience({ experience }) {
+  if (!experience?.length) return null
+
+  return (
+    <section id="experience" className="py-24">
+      <div className="section-wrapper">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="mb-16"
         >
-          <h2 className="text-3xl font-bold text-gray-900 mb-4">Experience</h2>
-          <p className="text-lg text-gray-600">My professional journey</p>
+          <p className="section-label mb-3">Career</p>
+          <h2 className="text-gray-100">Work Experience</h2>
         </motion.div>
 
-        <div className="space-y-8">
-          {experience.map((exp, index) => (
-            <motion.div
-              key={exp._id}
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: index * 0.1 }}
-              className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300"
-            >
-              <div className="p-6">
-                <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-4">
-                  <div className="flex-1">
-                    <div className="flex flex-wrap items-center gap-2 mb-2">
-                      <h3 className="text-xl font-semibold text-gray-900">{exp.title}</h3>
-                      <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getEmploymentTypeColor(exp.employmentType)}`}>
-                        {exp.employmentType.replace('-', ' ')}
-                      </span>
-                      {exp.current && (
-                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                          Current
-                        </span>
-                      )}
-                    </div>
-                    <p className="text-lg text-gray-700 font-medium mb-1">{exp.company}</p>
-                    {exp.location && (
-                      <p className="text-sm text-gray-500 mb-2 flex items-center">
-                        <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                        </svg>
-                        {exp.location}
-                      </p>
-                    )}
-                    <p className="text-sm text-gray-600 mb-3">
-                      {formatDate(exp.startDate)} - {formatDate(exp.endDate)}
-                    </p>
-                  </div>
-                </div>
-
-                <p className="text-gray-700 mb-4">{exp.description}</p>
-
-                {/* Responsibilities */}
-                {exp.responsibilities && exp.responsibilities.length > 0 && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Key Responsibilities:</h4>
-                    <ul className="list-disc list-inside space-y-1">
-                      {exp.responsibilities.slice(0, expandedItem === exp._id ? undefined : 3).map((responsibility, idx) => (
-                        <li key={idx} className="text-sm text-gray-600">{responsibility}</li>
-                      ))}
-                    </ul>
-                    {exp.responsibilities.length > 3 && (
-                      <button
-                        onClick={() => toggleExpanded(exp._id)}
-                        className="text-sm text-blue-600 hover:text-blue-800 mt-2"
-                      >
-                        {expandedItem === exp._id ? 'Show less' : `Show ${exp.responsibilities.length - 3} more`}
-                      </button>
-                    )}
-                  </div>
-                )}
-
-                {/* Achievements */}
-                {exp.achievements && exp.achievements.length > 0 && (
-                  <div className="mb-4">
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Key Achievements:</h4>
-                    <ul className="list-disc list-inside space-y-1">
-                      {exp.achievements.map((achievement, idx) => (
-                        <li key={idx} className="text-sm text-gray-600">{achievement}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-
-                {/* Technologies */}
-                {exp.technologies && exp.technologies.length > 0 && (
-                  <div>
-                    <h4 className="text-sm font-semibold text-gray-900 mb-2">Technologies Used:</h4>
-                    <div className="flex flex-wrap gap-2">
-                      {exp.technologies.map((tech, idx) => (
-                        <span
-                          key={idx}
-                          className="inline-block px-3 py-1 text-xs bg-gray-100 text-gray-700 rounded-full"
-                        >
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
+        <div className="max-w-3xl">
+          {experience.map((exp, i) => (
+            <ExperienceCard key={exp._id} exp={exp} index={i} />
           ))}
         </div>
       </div>
     </section>
-  );
-};
-
-export default Experience;
+  )
+}

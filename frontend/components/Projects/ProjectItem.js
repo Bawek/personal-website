@@ -1,60 +1,110 @@
-import Image from 'next/image'
-import React from 'react'
-import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa'
+import { HiStar } from 'react-icons/hi'
 
-const ProjectItem = ({ title, backgroundImg, tech, projectUrl, desc, sourceLink, demoLink }) => {
-    // Check if image is from uploads (dynamic) or static assets
-    const isDynamicImage = backgroundImg && typeof backgroundImg === 'string' && backgroundImg.includes('/uploads/');
-    
-    // Fallback image if no image provided
-    const imageSrc = backgroundImg || '/assets/placeholder.png';
+export default function ProjectItem({
+  title,
+  backgroundImg,
+  tech,
+  projectUrl,
+  desc,
+  sourceLink,
+  featured,
+}) {
+  const isDynamic = typeof backgroundImg === 'string' && backgroundImg?.includes('/uploads/')
+  const hasImage  = !!backgroundImg
 
-    return (
-        <motion.div initial={{ opacity: 0 }}
-            whileInView={{ y: [-50, 0], opacity: 1 }}
-            transition={{ duration: 1 }} className='flex  justify-center h-[540px] max-w-[530px] min-w-full my-1 shadow-xl shadow-gray-400 rounded-xl group cursor-pointer hover:scale-105 ease-in duration-300'>
-            <div className='my-0 py-0 min-w-full'>
-                <Link href={projectUrl}>
-                    <div className=' my-3'>
-                        {isDynamicImage ? (
-                            <img 
-                                src={imageSrc} 
-                                alt={title}
-                                className="w-full h-[350px] object-cover rounded-t-xl"
-                            />
-                        ) : (
-                            <Image 
-                                src={imageSrc} 
-                                alt={title}
-                                width={530}
-                                height={350}
-                                className="rounded-t-xl"
-                            />
-                        )}
-                    </div>
-                    <div className='px-8  text-center '>
-                        <h6 className='text-1xl text-black tracking-wider text-center '>{title}</h6>
-                        <p className='text-[14px] text-center text-gray-600 mb-2 max-w-[485px] ml-6 '>{desc}</p>
-                        <p className='pb-2 pt-2 text-black text-center text-[14px] font-semibold  max-w-[485px] ml-6'> Tech Stack :{tech}</p>
-                    </div>
-                </Link>
+  return (
+    <motion.article
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.5 }}
+      className="glass-card overflow-hidden flex flex-col group hover:border-violet-500/40 transition-all duration-300"
+    >
+      {/* Image */}
+      <div className="relative h-48 bg-surface-2 overflow-hidden flex-shrink-0">
+        {hasImage ? (
+          isDynamic ? (
+            <img
+              src={backgroundImg}
+              alt={title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          ) : (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={typeof backgroundImg === 'string' ? backgroundImg : backgroundImg?.src}
+              alt={title}
+              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+          )
+        ) : (
+          /* Placeholder gradient */
+          <div className="w-full h-full bg-gradient-to-br from-violet-900/40 to-pink-900/40 flex items-center justify-center">
+            <span className="text-4xl font-bold gradient-text opacity-30">{title?.charAt(0)}</span>
+          </div>
+        )}
 
-                <div className=' flex justify-center items-center min-w-full '>
-                   
+        {/* Featured badge */}
+        {featured && (
+          <div className="absolute top-3 right-3 flex items-center gap-1 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-mono">
+            <HiStar size={12} aria-hidden="true" />
+            Featured
+          </div>
+        )}
 
-                    <Link href={sourceLink} target={"_blank"}
-                        rel={"noreferrer"}>
-                        <button className='text-sm p-3 my-6 hover:scale-105 ease-in duration-300 mx-5  max-[500px]:w-[120px] min-[320px]:text-sm '>
-                            Source Code
-                        </button>
-                    </Link>
+        {/* Overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-bg/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+      </div>
 
-                </div>
-            </div>
+      {/* Content */}
+      <div className="flex flex-col flex-1 p-5">
+        <h3 className="text-white mb-2 text-lg">{title}</h3>
 
-        </motion.div>
-    )
+        {desc && (
+          <p className="text-gray-400 text-sm leading-relaxed mb-4 flex-1 line-clamp-3">
+            {desc}
+          </p>
+        )}
+
+        {/* Tech stack */}
+        {tech && (
+          <div className="flex flex-wrap gap-1.5 mb-5">
+            {tech.split(',').map((t) => (
+              <span key={t.trim()} className="tech-badge">{t.trim()}</span>
+            ))}
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div className="flex items-center gap-3 mt-auto pt-4 border-t border-white/5">
+          {sourceLink && sourceLink !== '#' && (
+            <a
+              href={sourceLink}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-ghost text-xs py-2 px-4 flex-1 justify-center"
+              aria-label={`View source code for ${title}`}
+            >
+              <FaGithub size={14} />
+              Source
+            </a>
+          )}
+          {projectUrl && projectUrl !== '#' && (
+            <a
+              href={projectUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="btn-primary text-xs py-2 px-4 flex-1 justify-center"
+              aria-label={`View live demo of ${title}`}
+            >
+              <FaExternalLinkAlt size={12} />
+              Live Demo
+            </a>
+          )}
+        </div>
+      </div>
+    </motion.article>
+  )
 }
-
-export default ProjectItem

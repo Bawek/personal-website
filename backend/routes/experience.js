@@ -4,10 +4,10 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
-// GET /api/experience - Get all experience entries for the authenticated user
-router.get('/', authenticate, async (req, res) => {
+// GET /api/experience - Get all experience entries (public)
+router.get('/', async (req, res) => {
   try {
-    const experiences = await Experience.find({ createdBy: req.user.id })
+    const experiences = await Experience.find()
       .sort({ current: -1, startDate: -1 });
     
     res.json({
@@ -23,13 +23,10 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
-// GET /api/experience/:id - Get a single experience entry
-router.get('/:id', authenticate, async (req, res) => {
+// GET /api/experience/:id - Get a single experience entry (public)
+router.get('/:id', async (req, res) => {
   try {
-    const experience = await Experience.findOne({ 
-      _id: req.params.id, 
-      createdBy: req.user.id 
-    });
+    const experience = await Experience.findById(req.params.id);
     
     if (!experience) {
       return res.status(404).json({

@@ -1,34 +1,145 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@100;200;300;400;500;600;700;800;900&display=swap");
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Fira+Code:wght@400;500&display=swap");
 
 @layer base {
+  :root {
+    --color-primary: 139 92 246;   /* violet-500 */
+    --color-accent:  236 72 153;   /* pink-500   */
+    --color-bg:      15 15 23;     /* near-black  */
+    --color-surface: 22 22 34;     /* card bg     */
+    --color-border:  255 255 255;  /* white/10    */
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
-    @apply text-[#1f2937] tracking-wide;
-  }
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    @apply font-bold;
+    @apply bg-[#0f0f17] text-gray-100 font-sans antialiased;
+    font-family: 'Inter', sans-serif;
   }
 
-  h1 {
-    @apply text-4xl sm:text-5xl md:text-6xl;
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-bold tracking-tight;
   }
 
-  h2 {
-    @apply text-3xl sm:text-4xl;
+  h1 { @apply text-4xl sm:text-5xl md:text-6xl; }
+  h2 { @apply text-3xl sm:text-4xl; }
+  h3 { @apply text-xl sm:text-2xl; }
+
+  ::selection {
+    @apply bg-violet-500/30 text-white;
   }
 
-  li {
-    @apply cursor-pointer;
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { @apply bg-[#0f0f17]; }
+  ::-webkit-scrollbar-thumb { @apply bg-violet-500/50 rounded-full; }
+  ::-webkit-scrollbar-thumb:hover { @apply bg-violet-500; }
+
+  /* Make native select/option readable on dark backgrounds */
+  select {
+    color-scheme: dark;
   }
 
-  button {
-    @apply shadow-xl shadow-gray-400 rounded-xl uppercase   bg-gradient-to-r from-purple-400 to-pink-600 text-white;
+  option {
+    background-color: #16161e;
+    color: #e2e8f0;
+  }
+
+  /* Date inputs — force light text on dark bg */
+  input[type="date"],
+  input[type="datetime-local"],
+  input[type="time"] {
+    color-scheme: dark;
+    @apply text-gray-200;
+  }
+
+  /* Color picker — remove default padding */
+  input[type="color"] {
+    @apply p-0.5 cursor-pointer;
+  }
+
+  /* Checkbox — violet accent */
+  input[type="checkbox"] {
+    accent-color: #8b5cf6;
+  }
+}
+
+@layer components {
+  /* Gradient text utility */
+  .gradient-text {
+    @apply text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500;
+  }
+
+  /* Section label */
+  .section-label {
+    @apply text-sm font-mono tracking-[0.2em] uppercase gradient-text;
+  }
+
+  /* Glass card */
+  .glass-card {
+    @apply bg-white/5 border border-white/10 rounded-2xl backdrop-blur-sm;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm
+           bg-gradient-to-r from-violet-500 to-pink-500 !text-white
+           hover:from-violet-400 hover:to-pink-400
+           transition-all duration-200 shadow-lg shadow-violet-500/25
+           focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-[#0f0f17];
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm
+           border border-white/20 !text-gray-300
+           hover:border-violet-500/60 hover:!text-white hover:bg-violet-500/10
+           transition-all duration-200
+           focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-[#0f0f17];
+  }
+
+  /* Icon button */
+  .btn-icon {
+    @apply p-3 rounded-xl border border-white/10 !text-gray-400
+           hover:border-violet-500/60 hover:!text-violet-400 hover:bg-violet-500/10
+           transition-all duration-200;
+  }
+
+  /* Section wrapper */
+  .section-wrapper {
+    @apply max-w-6xl mx-auto px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Tech badge */
+  .tech-badge {
+    @apply px-3 py-1 text-xs font-mono rounded-full
+           bg-violet-500/10 text-violet-300 border border-violet-500/20;
+  }
+
+  /* Admin form inputs — consistent dark style */
+  .admin-input {
+    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5
+           text-sm text-gray-200 placeholder-gray-600
+           focus:outline-none focus:border-violet-500/60 focus:bg-violet-500/5
+           transition-all duration-200;
+  }
+
+  /* Admin select — needs explicit bg so option text is readable */
+  .admin-select {
+    @apply w-full border border-white/10 rounded-xl px-4 py-2.5
+           text-sm text-gray-200
+           focus:outline-none focus:border-violet-500/60
+           transition-all duration-200;
+    background-color: #16161e;
+  }
+
+  /* Admin card section */
+  .admin-card {
+    @apply bg-white/5 border border-white/10 rounded-2xl p-6;
   }
 }

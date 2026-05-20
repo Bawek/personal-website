@@ -1,144 +1,137 @@
-import React from 'react'
-import Image from 'next/image'
-import html from '../../public/assets/html.png'
-import css from '../../public/assets/css3.png'
-import js from '../../public/assets/javascript.png'
-import react from '../../public/assets/react.png'
-import redux from '../../public/assets/redux.png'
+import { useState } from 'react'
+import { motion } from 'framer-motion'
 
-import next from '../../public/assets/nextjs.png'
-import bootstrap from '../../public/assets/bootstrap.png'
-import tailwind from '../../public/assets/tailwind.png'
-import github from '../../public/assets/github.png'
-import vscode from '../../public/assets/vscode.png'
-import dsa from '../../public/assets/data-structure.png'
-import { motion } from 'framer-motion';
-
-const Skills = ({ skills }) => {
-    return (
-        <div id='skills' className='w-full lg:h-screen p-2'>
-            <div className='max-w-[1240px] mx-auto flex flex-col justify-center h-full'>
-                <motion.div
-                    initial={{ x: 0, opacity: 0 }}
-                    whileInView={{ x: [-250, 0], opacity: 1 }}
-                    transition={{ duration: 1 }}
-                >
-                    <p className='text-xl tracking-widest uppercase font-bold-200 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-                        Skills
-                    </p>
-                    <h2 className='py-4'>What I Can Do</h2>
-                </motion.div>
-
-                <motion.div initial={{ opacity: 0 }}
-                    whileInView={{ y: [-50, 0], opacity: 1 }} className='grid grid-cols-2 lg:grid-cols-4 gap-8'>
-                    
-                    {skills && skills.length > 0 ? (
-                        skills.map((skill) => (
-                            <div key={skill._id} className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3 className='text-sm font-medium'>{skill.name}</h3>
-                                        <span className='text-xs text-gray-500 capitalize'>{skill.level}</span>
-                                        <span className='text-xs text-gray-400 capitalize'>{skill.category}</span>
-                                    </div>
-                                    <div className='m-auto'>
-                                        {/* You can add skill icons here based on skill name */}
-                                        <div className='w-8 h-8 bg-gradient-to-r from-purple-400 to-pink-600 rounded-lg flex items-center justify-center text-white text-xs font-bold'>
-                                            {skill.name.charAt(0)}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    ) : (
-                        // Fallback to default skills if no data
-                        <>
-                            <div className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3>React</h3>
-                                    </div>
-                                    <div className='m-auto'>
-                                        <Image src={react} width='35' height='35' alt='/' />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3>Redux</h3>
-                                    </div>
-                                    <div className='m-auto'>
-                                        <Image src={redux} width='35' height='35' alt='/' />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3 className='text-sm'>Context API</h3>
-                                    </div>
-                                    <div className='m-auto'>
-                                        <Image src={react} width='35' height='35' alt='/' />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3>Next Js</h3>
-                                    </div>
-                                    <div className='m-auto'>
-                                        <Image src={next} width='40' height='40' alt='/' />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3>HTML5</h3>
-                                    </div>
-                                    <div className='m-auto'>
-                                        <Image src={html} width='35' height='35' alt='/' />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3>CSS3</h3>
-                                    </div>
-                                    <div className='m-auto'>
-                                        <Image src={css} width='41' height='41' alt='/' />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3>JavaScript</h3>
-                                    </div>
-                                    <div className='m-auto'>
-                                        <Image src={js} width='61' height='61' alt='/' />
-                                    </div>
-                                </div>
-                            </div>
-                            <div className='p-6 shadow-xl rounded-xl hover:scale-105 ease-in duration-300'>
-                                <div className='grid grid-cols-2 gap-4 justify-center items-center'>
-                                    <div className='flex flex-col items-center justify-center'>
-                                        <h3>Tailwind CSS</h3>
-                                    </div>
-                                    <div className='m-auto'>
-                                        <Image src={tailwind} width='35' height='35' alt='/' />
-                                    </div>
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </motion.div>
-            </div>
-        </div>
-    )
+// Map skill names to simple colored initials — extend as needed
+const LEVEL_COLORS = {
+  beginner:     'from-gray-500    to-gray-400',
+  intermediate: 'from-blue-500    to-cyan-400',
+  advanced:     'from-violet-500  to-purple-400',
+  expert:       'from-violet-500  to-pink-500',
 }
 
-export default Skills
+const LEVEL_WIDTH = {
+  beginner:     'w-1/4',
+  intermediate: 'w-1/2',
+  advanced:     'w-3/4',
+  expert:       'w-full',
+}
+
+function SkillCard({ skill, index }) {
+  const gradient = LEVEL_COLORS[skill.level] || LEVEL_COLORS.intermediate
+  const barWidth = LEVEL_WIDTH[skill.level] || LEVEL_WIDTH.intermediate
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: index * 0.04 }}
+      className="glass-card p-4 hover:border-violet-500/30 transition-all duration-300 group"
+    >
+      <div className="flex items-center gap-3 mb-3">
+        {/* Icon placeholder — gradient initial */}
+        <div
+          className={`w-9 h-9 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}
+          aria-hidden="true"
+        >
+          {skill.name.charAt(0).toUpperCase()}
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-white truncate">{skill.name}</p>
+          <p className="text-xs text-gray-500 capitalize">{skill.category}</p>
+        </div>
+      </div>
+
+      {/* Level bar */}
+      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+        <motion.div
+          initial={{ width: 0 }}
+          whileInView={{ width: '100%' }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8, delay: index * 0.04 + 0.2 }}
+          className={`h-full ${barWidth} bg-gradient-to-r ${gradient} rounded-full`}
+        />
+      </div>
+      <p className="text-xs text-gray-600 mt-1 capitalize font-mono">{skill.level}</p>
+    </motion.div>
+  )
+}
+
+// Fallback static skills when no DB data
+const FALLBACK_SKILLS = [
+  { _id: '1', name: 'React',      category: 'frontend', level: 'expert'       },
+  { _id: '2', name: 'Next.js',    category: 'frontend', level: 'advanced'     },
+  { _id: '3', name: 'JavaScript', category: 'frontend', level: 'expert'       },
+  { _id: '4', name: 'TypeScript', category: 'frontend', level: 'intermediate' },
+  { _id: '5', name: 'Tailwind',   category: 'frontend', level: 'advanced'     },
+  { _id: '6', name: 'Node.js',    category: 'backend',  level: 'advanced'     },
+  { _id: '7', name: 'MongoDB',    category: 'backend',  level: 'intermediate' },
+  { _id: '8', name: 'Express',    category: 'backend',  level: 'advanced'     },
+  { _id: '9', name: 'Git',        category: 'tools',    level: 'advanced'     },
+  { _id: '10', name: 'Redux',     category: 'frontend', level: 'advanced'     },
+  { _id: '11', name: 'HTML5',     category: 'frontend', level: 'expert'       },
+  { _id: '12', name: 'CSS3',      category: 'frontend', level: 'expert'       },
+]
+
+export default function Skills({ skills }) {
+  const data = skills?.length ? skills : FALLBACK_SKILLS
+
+  // Get unique categories
+  const categories = ['all', ...new Set(data.map((s) => s.category))]
+  const [activeCategory, setActiveCategory] = useState('all')
+
+  const filtered = activeCategory === 'all'
+    ? data
+    : data.filter((s) => s.category === activeCategory)
+
+  return (
+    <section id="skills" className="py-24 bg-surface/30">
+      <div className="section-wrapper">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-12"
+        >
+          <p className="section-label mb-3">Expertise</p>
+          <h2 className="text-gray-100">Technical Skills</h2>
+        </motion.div>
+
+        {/* Category filter tabs */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.4, delay: 0.1 }}
+          className="flex flex-wrap gap-2 mb-10"
+          role="tablist"
+          aria-label="Filter skills by category"
+        >
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              role="tab"
+              aria-selected={activeCategory === cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-4 py-1.5 rounded-full text-sm font-mono capitalize transition-all duration-200 border
+                ${activeCategory === cat
+                  ? 'bg-violet-500/20 border-violet-500/50 text-violet-300'
+                  : 'border-white/10 text-gray-500 hover:border-white/20 hover:text-gray-300'
+                }`}
+            >
+              {cat}
+            </button>
+          ))}
+        </motion.div>
+
+        {/* Skills grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
+          {filtered.map((skill, i) => (
+            <SkillCard key={skill._id} skill={skill} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}

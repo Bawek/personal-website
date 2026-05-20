@@ -24,7 +24,26 @@ router.post('/register', [
       return res.status(400).json({ errors: errors.array() });
     }
 
-    const { username, email, password, role = 'viewer' } = req.body;
+    const { username, email, password } = req.body;
+
+    // Role assignment: only an authenticated admin can create admin/editor accounts.
+    // Anyone registering without a valid admin token gets 'viewer'.
+    let role = 'viewer';
+    const authHeader = req.header('Authorization');
+    if (authHeader && req.body.role && req.body.role !== 'viewer') {
+      try {
+        const decoded = require('jsonwebtoken').verify(
+          authHeader.replace('Bearer ', ''),
+          process.env.JWT_SECRET
+        );
+        const requestingUser = await User.findById(decoded.userId);
+        if (requestingUser && requestingUser.role === 'admin') {
+          role = req.body.role;
+        }
+      } catch {
+        // Invalid token — fall back to viewer
+      }
+    }
 
     // Check if user already exists
     const existingUser = await User.findOne({
@@ -35,6 +54,12 @@ router.post('/register', [
       return res.status(400).json({ 
         message: 'User with this email or username already exists' 
       });
+    }
+
+    // Allow first-ever user to be admin (bootstrapping)
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      role = 'admin';
     }
 
     // Create new user

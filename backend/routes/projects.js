@@ -38,10 +38,10 @@ const upload = multer({
   }
 });
 
-// GET /api/projects - Get all projects
-router.get('/', authenticate, async (req, res) => {
+// GET /api/projects - Get all projects (public)
+router.get('/', async (req, res) => {
   try {
-    const projects = await Project.find({ createdBy: req.user.id })
+    const projects = await Project.find()
       .sort({ featured: -1, createdAt: -1 });
     
     res.json({
@@ -57,13 +57,10 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
-// GET /api/projects/:id - Get a single project
-router.get('/:id', authenticate, async (req, res) => {
+// GET /api/projects/:id - Get a single project (public)
+router.get('/:id', async (req, res) => {
   try {
-    const project = await Project.findOne({ 
-      _id: req.params.id, 
-      createdBy: req.user.id 
-    });
+    const project = await Project.findById(req.params.id);
     
     if (!project) {
       return res.status(404).json({

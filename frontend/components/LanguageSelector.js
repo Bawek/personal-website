@@ -1,78 +1,70 @@
-import { useState, useEffect } from 'react'
-import { useTranslation, detectLanguage } from '@/lib/i18n'
+import { useState } from 'react'
+import { useLanguage } from '@/lib/LanguageContext'
+import { HiChevronDown } from 'react-icons/hi'
 
-const languages = [
-  { code: 'en', name: 'English', flag: 'US' },
-  { code: 'am', name: 'Amharic', flag: 'ET' },
-  { code: 'es', name: 'Español', flag: 'ES' },
+const LANGUAGES = [
+  { code: 'en', name: 'English', flag: '🇺🇸' },
+  { code: 'am', name: 'Amharic', flag: '🇪🇹' },
+  { code: 'es', name: 'Español', flag: '🇪🇸' },
 ]
 
 export default function LanguageSelector() {
-  const [currentLang, setCurrentLang] = useState('en')
-  const [isOpen, setIsOpen] = useState(false)
-  const { t } = useTranslation(currentLang)
+  const { language, setLanguage } = useLanguage()
+  const [open, setOpen] = useState(false)
 
-  useEffect(() => {
-    // Load saved language or detect browser language
-    const savedLang = localStorage.getItem('language') || detectLanguage()
-    setCurrentLang(savedLang)
-  }, [])
-
-  const changeLanguage = (langCode) => {
-    setCurrentLang(langCode)
-    localStorage.setItem('language', langCode)
-    setIsOpen(false)
-    
-    // Trigger page reload to apply new language
-    window.location.reload()
-  }
-
-  const currentLanguage = languages.find(lang => lang.code === currentLang) || languages[0]
+  const current = LANGUAGES.find(l => l.code === language) || LANGUAGES[0]
 
   return (
     <div className="relative">
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 hover:text-gray-900 transition-colors"
+        onClick={() => setOpen(!open)}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="flex items-center gap-2 px-3 py-2 rounded-xl border border-white/10 text-gray-300
+                   hover:border-violet-500/40 hover:text-white transition-all duration-200 text-sm"
       >
-        <span className="text-lg">{currentLanguage.flag}</span>
-        <span>{currentLanguage.name}</span>
-        <svg
-          className={`w-4 h-4 transition-transform ${isOpen ? 'rotate-180' : ''}`}
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-        </svg>
+        <span aria-hidden="true">{current.flag}</span>
+        <span>{current.name}</span>
+        <HiChevronDown
+          size={14}
+          className={`text-gray-500 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          aria-hidden="true"
+        />
       </button>
 
-      {isOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
-          <div className="py-1">
-            {languages.map((language) => (
+      {open && (
+        <>
+          {/* Backdrop */}
+          <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
+
+          <div
+            role="listbox"
+            aria-label="Select language"
+            className="absolute right-0 mt-2 w-44 z-50 bg-[#16161e] border border-white/10 rounded-xl shadow-xl shadow-black/40 overflow-hidden"
+          >
+            {LANGUAGES.map((lang) => (
               <button
-                key={language.code}
-                onClick={() => changeLanguage(language.code)}
-                className={`w-full flex items-center space-x-3 px-4 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                  currentLang === language.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'
-                }`}
+                key={lang.code}
+                role="option"
+                aria-selected={language === lang.code}
+                onClick={() => { setLanguage(lang.code); setOpen(false) }}
+                className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors
+                  ${language === lang.code
+                    ? 'bg-violet-500/15 text-violet-300'
+                    : 'text-gray-400 hover:bg-white/5 hover:text-white'
+                  }`}
               >
-                <span className="text-lg">{language.flag}</span>
-                <span>{language.name}</span>
-                {currentLang === language.code && (
-                  <svg className="w-4 h-4 ml-auto" fill="currentColor" viewBox="0 0 20 20">
-                    <path
-                      fillRule="evenodd"
-                      d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                      clipRule="evenodd"
-                    />
+                <span aria-hidden="true">{lang.flag}</span>
+                <span>{lang.name}</span>
+                {language === lang.code && (
+                  <svg className="w-3.5 h-3.5 ml-auto text-violet-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                   </svg>
                 )}
               </button>
             ))}
           </div>
-        </div>
+        </>
       )}
     </div>
   )

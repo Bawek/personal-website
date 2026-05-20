@@ -1,59 +1,33 @@
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/router'
 
-const AuthProtection = ({ children, requireAuth = true }) => {
-  const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+export default function AuthProtection({ children, requireAuth = true }) {
+  const router = useRouter()
+  const [ready, setReady] = useState(false)
+  const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
-    // Only access localStorage on client-side
-    if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
-      const user = localStorage.getItem('user');
-      const authenticated = !!(token && user);
+    const token = localStorage.getItem('token')
+    const user  = localStorage.getItem('user')
+    const ok    = !!(token && user)
+    setAuthed(ok)
 
-      setIsAuthenticated(authenticated);
+    if (requireAuth && !ok) { router.replace('/admin/login');     return }
+    if (!requireAuth && ok) { router.replace('/admin/dashboard'); return }
 
-      // If authentication is required but user is not logged in
-      if (requireAuth && !authenticated) {
-        router.push('/admin/login');
-        return;
-      }
+    setReady(true)
+  }, [router, requireAuth])
 
-      // If user is logged in but trying to access login/register pages
-      if (!requireAuth && authenticated) {
-        router.push('/admin/dashboard');
-        return;
-      }
-    }
-    setIsLoading(false);
-  }, [router, requireAuth]);
-
-  // Show loading state while checking authentication
-  if (isLoading) {
+  if (!ready) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-[#0f0f17] flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+          <p className="text-gray-500 text-sm font-mono">Loading…</p>
         </div>
       </div>
-    );
+    )
   }
 
-  // If requireAuth is false, render children (for login/register pages)
-  if (!requireAuth) {
-    return <>{children}</>;
-  }
-
-  // If requireAuth is true and user is not authenticated, don't render (will redirect)
-  if (!isAuthenticated) {
-    return null;
-  }
-
-  // User is authenticated, render children
-  return <>{children}</>;
-};
-
-export default AuthProtection;
+  return <>{children}</>
+}

@@ -8,60 +8,59 @@ import Skills from '@/components/Skills/Skills'
 import Projects from '@/components/Projects/Projects'
 import Contact from '@/components/Contact/Contact'
 import AdminLoginButton from '@/components/AdminLoginButton'
-import { AnimatePresence, motion } from 'framer-motion'
 import { projectsAPI, skillsAPI, experienceAPI, aboutAPI, contactAPI, settingsAPI } from '@/lib/api'
 
 export default function Home() {
-  const [settings, setSettings] = useState(null)
+  const [settings, setSettings]   = useState(null)
   const [aboutData, setAboutData] = useState(null)
   const [contactData, setContactData] = useState(null)
-  const [skills, setSkills] = useState([])
-  const [projects, setProjects] = useState([])
+  const [skills, setSkills]       = useState([])
+  const [projects, setProjects]   = useState([])
   const [experience, setExperience] = useState([])
-  const [loading, setLoading] = useState(true)
+  const [loading, setLoading]     = useState(true)
 
   useEffect(() => {
-    fetchContent()
+    const fetchAll = async () => {
+      try {
+        const [settingsRes, aboutRes, contactRes, skillsRes, projectsRes, experienceRes] =
+          await Promise.allSettled([
+            settingsAPI.get(),
+            aboutAPI.get(),
+            contactAPI.get(),
+            skillsAPI.getAll(),
+            projectsAPI.getAll(),
+            experienceAPI.getAll(),
+          ])
+
+        if (settingsRes.status   === 'fulfilled') setSettings(settingsRes.value.data.settings)
+        if (aboutRes.status      === 'fulfilled') setAboutData(aboutRes.value.data.about)
+        if (contactRes.status    === 'fulfilled') setContactData(contactRes.value.data.contact)
+        if (skillsRes.status     === 'fulfilled') setSkills(skillsRes.value.data.skills || [])
+        if (projectsRes.status   === 'fulfilled') setProjects(projectsRes.value.data.projects || [])
+        if (experienceRes.status === 'fulfilled') setExperience(experienceRes.value.data.experiences || [])
+      } catch (err) {
+        console.error('Error fetching content:', err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAll()
   }, [])
 
-  const fetchContent = async () => {
-    try {
-      // Fetch all data from new APIs
-      const [settingsResponse, aboutResponse, contactResponse, skillsResponse, projectsResponse, experienceResponse] = await Promise.all([
-        settingsAPI.get(),
-        aboutAPI.get(),
-        contactAPI.get(),
-        skillsAPI.getAll(),
-        projectsAPI.getAll(),
-        experienceAPI.getAll()
-      ])
-
-      setSettings(settingsResponse.data.settings)
-      setAboutData(aboutResponse.data.about)
-      setContactData(contactResponse.data.contact)
-      setSkills(skillsResponse.data.skills || [])
-      setProjects(projectsResponse.data.projects || [])
-      setExperience(experienceResponse.data.experiences || [])
-    } catch (error) {
-      console.error('Error fetching content:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const siteTitle       = settings?.siteName        || 'Baweke | Software Engineer'
+  const siteDescription = settings?.siteDescription || 'Personal portfolio of Baweke Mekonnen — Software Engineer'
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="min-h-screen bg-bg flex items-center justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-10 h-10 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+          <p className="text-gray-500 text-sm font-mono">Loading…</p>
         </div>
       </div>
     )
   }
-
-  const siteTitle = settings?.siteName || 'Baweke | Front-End Developer'
-  const siteDescription = settings?.siteDescription || 'Welcome to my personal website'
 
   return (
     <>
@@ -69,17 +68,22 @@ export default function Home() {
         <title>{siteTitle}</title>
         <meta name="description" content={siteDescription} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta property="og:title" content={siteTitle} />
+        <meta property="og:description" content={siteDescription} />
         {settings?.favicon && <link rel="icon" href={settings.favicon} />}
       </Head>
+
       <Navbar />
-      <AnimatePresence>
+
+      <main>
         <Hero content={aboutData?.hero} />
         <About content={aboutData} experience={experience} />
         <Experience experience={experience} />
         <Skills skills={skills} />
         <Projects projects={projects} />
         <Contact content={contactData} />
-      </AnimatePresence>
+      </main>
+
       <AdminLoginButton />
     </>
   )

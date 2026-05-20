@@ -10,16 +10,18 @@ router.post('/github/webhook', express.raw({ type: 'application/json' }), async 
   try {
     const signature = req.headers['x-hub-signature-256'];
     const payload = req.body;
-    
-    // Verify webhook signature (optional but recommended)
-    // const crypto = require('crypto');
-    // const hmac = crypto.createHmac('sha256', process.env.GITHUB_WEBHOOK_SECRET);
-    // hmac.update(JSON.stringify(payload));
-    // const expectedSignature = `sha256=${hmac.digest('hex')}`;
-    
-    // if (signature !== expectedSignature) {
-    //   return res.status(401).json({ error: 'Invalid signature' });
-    // }
+
+    // Verify webhook signature
+    if (process.env.GITHUB_WEBHOOK_SECRET) {
+      const crypto = require('crypto');
+      const hmac = crypto.createHmac('sha256', process.env.GITHUB_WEBHOOK_SECRET);
+      hmac.update(payload); // payload is raw Buffer from express.raw()
+      const expectedSignature = `sha256=${hmac.digest('hex')}`;
+
+      if (signature !== expectedSignature) {
+        return res.status(401).json({ error: 'Invalid signature' });
+      }
+    }
 
     const githubService = new GitHubService();
     await githubService.handleWebhook(payload);

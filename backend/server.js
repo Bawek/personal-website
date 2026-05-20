@@ -19,25 +19,36 @@ const syncRoutes = require('./routes/sync');
 
 const app = express();
 
+// Fail fast if critical env vars are missing
+if (!process.env.JWT_SECRET || process.env.JWT_SECRET.includes('change_me')) {
+  console.error('❌  FATAL: JWT_SECRET is not set or is still the placeholder. Set a real secret in backend/.env');
+  process.exit(1);
+}
+if (!process.env.MONGODB_URI) {
+  console.error('❌  FATAL: MONGODB_URI is not set in backend/.env');
+  process.exit(1);
+}
+
 // Trust proxy for Next.js development
 app.set('trust proxy', 1);
 
 // Security middleware
 app.use(helmet());
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? ['https://your-domain.com'] 
+  origin: process.env.NODE_ENV === 'production'
+    ? (process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
     : ['http://localhost:3000'],
   credentials: true
 }));
 
 // Rate limiting
+// Note: trustProxy is NOT a valid option in express-rate-limit v7+.
+// Proxy trust is handled by app.set('trust proxy', 1) above.
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  trustProxy: true, // trust X-Forwarded-For headers
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+  max: 100,                  // limit each IP to 100 requests per windowMs
+  standardHeaders: true,     // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false,      // Disable the `X-RateLimit-*` headers
 });
 app.use(limiter);
 
@@ -65,11 +76,10 @@ app.use('/api/sync', syncRoutes);
 // Serve static files from uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Serve static files from frontend
-app.use(express.static('../frontend/build'));
-
-// Note: Catch-all route removed for development
-// In production, you might need a proper routing solution
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

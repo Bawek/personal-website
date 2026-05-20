@@ -1,191 +1,143 @@
-import { useState } from 'react';
-import { useRouter } from 'next/router';
-import Link from 'next/link';
-import axios from 'axios';
-import { motion } from 'framer-motion';
+import { useState } from 'react'
+import { useRouter } from 'next/router'
+import Link from 'next/link'
+import axios from 'axios'
+import { motion } from 'framer-motion'
+import { HiLockClosed, HiMail, HiUser, HiShieldCheck } from 'react-icons/hi'
+
+const ROLES = [
+  { value: 'admin',  label: 'Admin',  desc: 'Full access to all features and user management' },
+  { value: 'editor', label: 'Editor', desc: 'Can create and edit content, but not manage users' },
+  { value: 'viewer', label: 'Viewer', desc: 'Read-only access to content' },
+]
 
 export default function AdminRegister() {
-  const [formData, setFormData] = useState({
-    username: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    role: 'viewer'
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const router = useRouter();
+  const [form, setForm]       = useState({ username: '', email: '', password: '', confirmPassword: '', role: 'viewer' })
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState('')
+  const router = useRouter()
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
+  const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value })
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    // Validate passwords match
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-
+    e.preventDefault()
+    if (form.password !== form.confirmPassword) { setError('Passwords do not match'); return }
+    setLoading(true); setError('')
     try {
-      const { confirmPassword, ...registrationData } = formData;
-      const response = await axios.post('/api/auth/register', registrationData);
-      
-      // Store token and user data
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-      
-      // Redirect to admin dashboard
-      router.push('/admin/dashboard');
+      const { confirmPassword, ...data } = form
+      const res = await axios.post('/api/auth/register', data)
+      localStorage.setItem('token', res.data.token)
+      localStorage.setItem('user', JSON.stringify(res.data.user))
+      router.push('/admin/dashboard')
     } catch (err) {
-      setError(err.response?.data?.message || 'Registration failed');
+      setError(err.response?.data?.message || 'Registration failed')
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-[#0f0f17] flex items-center justify-center p-4">
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-violet-600/8 blur-[100px] pointer-events-none" />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 24 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-white rounded-2xl shadow-xl p-8 w-full max-w-md"
+        className="w-full max-w-md relative z-10"
       >
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-800 mb-2">Admin Registration</h1>
-          <p className="text-gray-600">Create a new admin account</p>
+          <span className="font-mono font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">
+            baweke<span className="text-violet-400">.</span>admin
+          </span>
+          <p className="text-gray-500 text-sm mt-2">Create a new account</p>
         </div>
 
-        {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
-            {error}
-          </div>
-        )}
+        <div className="bg-white/5 border border-white/10 rounded-2xl p-8 backdrop-blur-sm">
+          {error && (
+            <div className="mb-5 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm" role="alert">
+              {error}
+            </div>
+          )}
 
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700 mb-2">
-              Username
-            </label>
-            <input
-              type="text"
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="Choose a username"
-              required
-            />
-          </div>
+          <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+            {/* Username */}
+            <div>
+              <label htmlFor="username" className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Username</label>
+              <div className="relative">
+                <HiUser size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input id="username" name="username" type="text" required minLength={3}
+                  value={form.username} onChange={handleChange} placeholder="Choose a username"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/60 focus:bg-violet-500/5 transition-all" />
+              </div>
+            </div>
 
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
-            </label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="admin@example.com"
-              required
-            />
-          </div>
+            {/* Email */}
+            <div>
+              <label htmlFor="email" className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Email</label>
+              <div className="relative">
+                <HiMail size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input id="email" name="email" type="email" required
+                  value={form.email} onChange={handleChange} placeholder="admin@example.com"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/60 focus:bg-violet-500/5 transition-all" />
+              </div>
+            </div>
 
-          <div>
-            <label htmlFor="role" className="block text-sm font-medium text-gray-700 mb-2">
-              Role
-            </label>
-            <select
-              id="role"
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              required
-            >
-              <option value="viewer">Viewer (Read Only)</option>
-              <option value="editor">Editor (Content Manager)</option>
-              <option value="admin">Admin (Full Access)</option>
-            </select>
-            <p className="mt-1 text-xs text-gray-500">
-              Choose the appropriate permission level for this user
-            </p>
-          </div>
+            {/* Role */}
+            <div>
+              <label className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Role</label>
+              <div className="grid grid-cols-3 gap-2">
+                {ROLES.map(({ value, label }) => (
+                  <button key={value} type="button" onClick={() => setForm({ ...form, role: value })}
+                    className={`py-2 px-3 rounded-xl text-xs font-medium border transition-all
+                      ${form.role === value
+                        ? 'bg-violet-500/20 border-violet-500/50 text-violet-300'
+                        : 'border-white/10 text-gray-500 hover:border-white/20 hover:text-gray-300'}`}>
+                    {label}
+                  </button>
+                ))}
+              </div>
+              <p className="text-xs text-gray-600 mt-1.5">
+                {ROLES.find(r => r.value === form.role)?.desc}
+              </p>
+            </div>
 
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="•••••••••"
-              required
-              minLength="6"
-            />
-          </div>
+            {/* Password */}
+            <div>
+              <label htmlFor="password" className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Password</label>
+              <div className="relative">
+                <HiLockClosed size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input id="password" name="password" type="password" required minLength={6}
+                  value={form.password} onChange={handleChange} placeholder="Min 6 characters"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/60 focus:bg-violet-500/5 transition-all" />
+              </div>
+            </div>
 
-          <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm Password
-            </label>
-            <input
-              type="password"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
-              placeholder="•••••••••"
-              required
-              minLength="6"
-            />
-          </div>
+            {/* Confirm */}
+            <div>
+              <label htmlFor="confirmPassword" className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Confirm Password</label>
+              <div className="relative">
+                <HiShieldCheck size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+                <input id="confirmPassword" name="confirmPassword" type="password" required
+                  value={form.confirmPassword} onChange={handleChange} placeholder="Repeat password"
+                  className="w-full bg-white/5 border border-white/10 rounded-xl pl-10 pr-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-violet-500/60 focus:bg-violet-500/5 transition-all" />
+              </div>
+            </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? 'Creating Account...' : 'Create Account'}
-          </button>
-        </form>
+            <button type="submit" disabled={loading}
+              className="w-full flex items-center justify-center gap-2 py-3 rounded-xl font-semibold text-sm
+                         bg-gradient-to-r from-violet-500 to-pink-500 text-white hover:from-violet-400 hover:to-pink-400
+                         transition-all duration-200 shadow-lg shadow-violet-500/25 disabled:opacity-50 disabled:cursor-not-allowed mt-2">
+              {loading ? <><span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />Creating…</> : 'Create Account'}
+            </button>
+          </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-sm text-gray-600">
+          <p className="text-center text-sm text-gray-600 mt-6">
             Already have an account?{' '}
-            <Link href="/admin/login" className="text-blue-600 hover:text-blue-700 font-medium">
-              Sign in here
-            </Link>
+            <Link href="/admin/login" className="text-violet-400 hover:text-violet-300 transition-colors">Sign in</Link>
           </p>
-        </div>
-
-        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
-          <h3 className="text-sm font-medium text-blue-800 mb-2">Role Permissions:</h3>
-          <ul className="text-xs text-blue-700 space-y-1">
-            <li><strong>Admin:</strong> Full access to all features and user management</li>
-            <li><strong>Editor:</strong> Can create and edit content, but not manage users</li>
-            <li><strong>Viewer:</strong> Read-only access to content</li>
-          </ul>
         </div>
       </motion.div>
     </div>
-  );
+  )
 }

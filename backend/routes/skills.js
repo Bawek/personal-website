@@ -4,10 +4,10 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
-// GET /api/skills - Get all skills for the authenticated user
-router.get('/', authenticate, async (req, res) => {
+// GET /api/skills - Get all skills (public)
+router.get('/', async (req, res) => {
   try {
-    const skills = await Skill.find({ createdBy: req.user.id })
+    const skills = await Skill.find()
       .sort({ category: 1, level: 1, name: 1 });
     
     res.json({
@@ -23,13 +23,10 @@ router.get('/', authenticate, async (req, res) => {
   }
 });
 
-// GET /api/skills/:id - Get a single skill
-router.get('/:id', authenticate, async (req, res) => {
+// GET /api/skills/:id - Get a single skill (public)
+router.get('/:id', async (req, res) => {
   try {
-    const skill = await Skill.findOne({ 
-      _id: req.params.id, 
-      createdBy: req.user.id 
-    });
+    const skill = await Skill.findById(req.params.id);
     
     if (!skill) {
       return res.status(404).json({

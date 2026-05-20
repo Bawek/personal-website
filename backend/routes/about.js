@@ -4,22 +4,14 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
-// GET /api/about - Get about section for the authenticated user
-router.get('/', authenticate, async (req, res) => {
+// GET /api/about - Get about section (public, returns first available)
+router.get('/', async (req, res) => {
   try {
-    let about = await About.findOne({ createdBy: req.user.id });
-    
-    // If no about section exists, create a default one
-    if (!about) {
-      about = new About({
-        createdBy: req.user.id
-      });
-      await about.save();
-    }
+    const about = await About.findOne().sort({ createdAt: 1 });
     
     res.json({
       success: true,
-      about: about
+      about: about || null
     });
   } catch (error) {
     console.error('Error fetching about data:', error);

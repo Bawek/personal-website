@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema({
   lastLogin: {
     type: Date,
     default: Date.now
+  },
+  syncSettings: {
+    autoSyncGithub: { type: Boolean, default: false },
+    autoPostLinkedin: { type: Boolean, default: false },
+    githubUsername: { type: String, default: '' },
+    linkedinEnabled: { type: Boolean, default: false }
   }
 }, {
   timestamps: true

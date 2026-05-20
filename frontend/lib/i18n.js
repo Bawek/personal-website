@@ -62,60 +62,60 @@ export const translations = {
   am: {
     // Navigation
     nav: {
-      home: 'Home',
-      about: 'About',
-      skills: 'Skills',
-      projects: 'Projects',
-      contact: 'Contact'
+      home: 'መነሻ',
+      about: 'ስለ እኔ',
+      skills: 'ክህሎቶች',
+      projects: 'ፕሮጀክቶች',
+      contact: 'ያግኙኝ'
     },
     // Hero section
     hero: {
-      greeting: 'Hello, I\'m',
-      title: 'Front-End Developer',
-      description: 'Creating beautiful and functional web experiences',
-      cta: 'Get In Touch',
-      learnMore: 'Learn More'
+      greeting: 'ሰላም፣ እኔ',
+      title: 'የፊት-ኤንድ ገንቢ',
+      description: 'ቆንጆ እና ተግባራዊ የድር ልምዶችን መፍጠር',
+      cta: 'ያግኙኝ',
+      learnMore: 'ተጨማሪ ይወቁ'
     },
     // About section
     about: {
-      title: 'About Me',
-      description: 'Passionate developer with expertise in modern web technologies',
-      skillsHeading: 'My Skills',
-      experienceHeading: 'Experience'
+      title: 'ስለ እኔ',
+      description: 'በዘመናዊ የድር ቴክኖሎጂዎች ላይ ልምድ ያለው ቀናተኛ ገንቢ',
+      skillsHeading: 'ክህሎቶቼ',
+      experienceHeading: 'ልምድ'
     },
     // Skills section
     skills: {
-      title: 'Technical Skills',
+      title: 'ቴክኒካዊ ክህሎቶች',
       categories: {
-        frontend: 'Frontend',
-        backend: 'Backend',
-        tools: 'Tools'
+        frontend: 'ፊት-ኤንድ',
+        backend: 'ባክ-ኤንድ',
+        tools: 'መሳሪያዎች'
       }
     },
     // Projects section
     projects: {
-      title: 'My Projects',
-      viewProject: 'View Project',
-      sourceCode: 'Source Code',
-      technologies: 'Technologies'
+      title: 'ፕሮጀክቶቼ',
+      viewProject: 'ፕሮጀክት ይመልከቱ',
+      sourceCode: 'ምንጭ ኮድ',
+      technologies: 'ቴክኖሎጂዎች'
     },
     // Contact section
     contact: {
-      title: 'Get In Touch',
-      subtitle: 'Let\'s work together',
-      name: 'Name',
-      email: 'Email',
-      message: 'Message',
-      send: 'Send Message',
-      success: 'Message sent successfully!',
-      error: 'Failed to send message'
+      title: 'ያግኙኝ',
+      subtitle: 'አብረን እንስራ',
+      name: 'ስም',
+      email: 'ኢሜይል',
+      message: 'መልዕክት',
+      send: 'መልዕክት ላክ',
+      success: 'መልዕክቱ በተሳካ ሁኔታ ተልኳል!',
+      error: 'መልዕክቱን መላክ አልተሳካም'
     },
     // Common
     common: {
-      loading: 'Loading...',
-      error: 'An error occurred',
-      retry: 'Retry',
-      close: 'Close'
+      loading: 'በመጫን ላይ...',
+      error: 'ስህተት ተከስቷል',
+      retry: 'እንደገና ሞክር',
+      close: 'ዝጋ'
     }
   },
   es: {

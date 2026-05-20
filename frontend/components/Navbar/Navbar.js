@@ -1,102 +1,168 @@
-import React, { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { AiOutlineMenu, AiOutlineClose, AiOutlineMail } from 'react-icons/ai'
-import { FaLinkedinIn, FaGithub } from 'react-icons/fa'
-import { SiLeetcode } from 'react-icons/si'
+import { FaGithub, FaLinkedinIn } from 'react-icons/fa'
+import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'
+import { motion, AnimatePresence } from 'framer-motion'
 
-const Navbar = () => {
-  const [nav, setNav] = useState(false)
-  const handleNav = () => {
-    setNav(!nav)
-  }
+const NAV_LINKS = [
+  { label: 'About',      href: '/#about'    },
+  { label: 'Experience', href: '/#experience'},
+  { label: 'Skills',     href: '/#skills'   },
+  { label: 'Projects',   href: '/#projects' },
+  { label: 'Blog',       href: '/blog'      },
+  { label: 'Contact',    href: '/#contact'  },
+]
+
+export default function Navbar() {
+  const [open, setOpen]       = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  // Close mobile menu on route change / resize
+  useEffect(() => {
+    const close = () => setOpen(false)
+    window.addEventListener('resize', close)
+    return () => window.removeEventListener('resize', close)
+  }, [])
 
   return (
-    <div className='fixed w-full shadow-xl h-20 z-[100]'>
-      <div className='flex justify-between items-center w-full h-full px-2 2xl:px-16'>
-        <div>
-          <ul>
-            <Link href='/'>
-              <li className='ml-10 font-extrabold text-1xl uppercase text-sm font-mono border-b bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-                Baweke
-              </li>
-            </Link>
-          </ul>
-        </div>
-        <div>
-          <ul className='hidden md:flex'>
-            <Link href='/'><li className='ml-10 uppercase text-sm hover:border-b'>Home</li></Link>
-            <Link href='/#about'><li className='ml-10 uppercase text-sm hover:border-b'>About</li></Link>
-            <Link href='/#skills'><li className='ml-10 uppercase text-sm hover:border-b'>Skills</li></Link>
-            <Link href='/#projects'><li className='ml-10 uppercase text-sm hover:border-b'>Projects</li></Link>
-            <a href='/baweke.pdf' target='_blank' rel='noreferrer'>
-              <li className='ml-10 uppercase text-sm hover:border-b'>Resume</li>
-            </a>
-            <Link href='/#contact'><li className='ml-10 uppercase text-sm hover:border-b'>Contact</li></Link>
-          </ul>
-          <div onClick={handleNav} className='md:hidden'>
-            <AiOutlineMenu size={25} />
-          </div>
-        </div>
-      </div>
+    <>
+      <header
+        className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+          scrolled
+            ? 'bg-bg/80 backdrop-blur-md border-b border-white/5 shadow-lg shadow-black/20'
+            : 'bg-transparent'
+        }`}
+      >
+        <nav className="section-wrapper flex items-center justify-between h-16" aria-label="Main navigation">
+          {/* Logo */}
+          <Link
+            href="/"
+            className="font-mono font-bold text-lg gradient-text hover:opacity-80 transition-opacity"
+            aria-label="Home"
+          >
+            baweke<span className="text-violet-400">.</span>dev
+          </Link>
 
-      {/* Mobile Menu Overlay */}
-      <div className={nav ? 'md:hidden fixed left-0 top-0 w-full h-screen bg-black/70' : ''}>
-        <div className={
-          nav
-            ? 'fixed left-0 top-0 w-[75%] sm:w-[60%] md:w-[45%] h-screen bg-[#ecf0f3] p-10 ease-in duration-500'
-            : 'fixed left-[-100%] top-0 p-10 ease-in duration-500'
-        }>
-          <div className='flex w-full items-center justify-end'>
-            <div onClick={handleNav} className='rounded-full shadow-lg shadow-gray-400 p-3 cursor-pointer'>
-              <AiOutlineClose size={10} />
-            </div>
-          </div>
-
-          <div className='py-4 flex flex-col'>
-            <ul className='uppercase'>
-              <Link href='/'><li onClick={() => setNav(false)} className='py-4 text-sm'>Home</li></Link>
-              <Link href='/#about'><li onClick={() => setNav(false)} className='py-4 text-sm'>About</li></Link>
-              <Link href='/#skills'><li onClick={() => setNav(false)} className='py-4 text-sm'>Skills</li></Link>
-              <Link href='/#projects'><li onClick={() => setNav(false)} className='py-4 text-sm'>Projects</li></Link>
-              <a href='/baweke.pdf' target='_blank' rel='noreferrer'>
-                <li onClick={() => setNav(false)} className='py-4 text-sm'>Resume</li>
-              </a>
-              <Link href='/#contact'><li onClick={() => setNav(false)} className='py-4 text-sm'>Contact</li></Link>
-            </ul>
-
-            <div className='pt-40'>
-              <p className='uppercase tracking-widest font-bold-200 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600'>
-                Let&#39;s Connect
-              </p>
-              <div className='flex items-center justify-between my-5 w-full sm:w-[80%]'>
-                <a href='https://github.com/Bawek' target='_blank' rel='noreferrer'>
-                  <div className='rounded-full shadow-lg shadow-gray-400 p-3 cursor-pointer hover:scale-105 ease-in duration-300'>
-                    <FaGithub />
-                  </div>
-                </a>
-                <a href='https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/' target='_blank' rel='noreferrer'>
-                  <div className='rounded-full shadow-lg shadow-gray-400 p-3 cursor-pointer hover:scale-105 ease-in duration-300'>
-                    <FaLinkedinIn />
-                  </div>
-                </a>
-                <Link href='/#contact'>
-                  <div
-                    onClick={() => {
-                      setNav(false)
-                      window.location.href = 'mailto:dilkashpeshimam@gmail.com'
-                    }}
-                    className='rounded-full shadow-lg shadow-gray-400 p-3 cursor-pointer hover:scale-105 ease-in duration-300'
-                  >
-                    <AiOutlineMail />
-                  </div>
+          {/* Desktop links */}
+          <ul className="hidden md:flex items-center gap-1" role="list">
+            {NAV_LINKS.map(({ label, href }) => (
+              <li key={label}>
+                <Link
+                  href={href}
+                  className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200 font-medium"
+                >
+                  {label}
                 </Link>
-              </div>
-            </div>
+              </li>
+            ))}
+          </ul>
+
+          {/* Desktop social + CTA */}
+          <div className="hidden md:flex items-center gap-3">
+            <a
+              href="https://github.com/Bawek"
+              target="_blank"
+              rel="noreferrer"
+              className="btn-icon"
+              aria-label="GitHub"
+            >
+              <FaGithub size={16} />
+            </a>
+            <a
+              href="https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/"
+              target="_blank"
+              rel="noreferrer"
+              className="btn-icon"
+              aria-label="LinkedIn"
+            >
+              <FaLinkedinIn size={16} />
+            </a>
+            <a href="/#contact" className="btn-primary text-xs py-2 px-4">
+              Hire Me
+            </a>
           </div>
-        </div>
-      </div>
-    </div>
+
+          {/* Mobile hamburger */}
+          <button
+            onClick={() => setOpen(!open)}
+            className="md:hidden btn-icon"
+            aria-label={open ? 'Close menu' : 'Open menu'}
+            aria-expanded={open}
+          >
+            {open ? <AiOutlineClose size={18} /> : <AiOutlineMenu size={18} />}
+          </button>
+        </nav>
+      </header>
+
+      {/* Mobile drawer */}
+      <AnimatePresence>
+        {open && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setOpen(false)}
+              className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden"
+            />
+
+            {/* Drawer */}
+            <motion.div
+              key="drawer"
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-surface border-l border-white/10 p-6 flex flex-col md:hidden"
+            >
+              <div className="flex items-center justify-between mb-8">
+                <span className="font-mono font-bold gradient-text">baweke.dev</span>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="btn-icon"
+                  aria-label="Close menu"
+                >
+                  <AiOutlineClose size={16} />
+                </button>
+              </div>
+
+              <ul className="flex flex-col gap-1 flex-1" role="list">
+                {NAV_LINKS.map(({ label, href }) => (
+                  <li key={label}>
+                    <Link
+                      href={href}
+                      onClick={() => setOpen(false)}
+                      className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 font-medium"
+                    >
+                      {label}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+
+              <div className="pt-6 border-t border-white/10">
+                <p className="text-xs text-gray-500 mb-4 font-mono tracking-widest uppercase">Connect</p>
+                <div className="flex gap-3">
+                  <a href="https://github.com/Bawek" target="_blank" rel="noreferrer" className="btn-icon" aria-label="GitHub">
+                    <FaGithub size={16} />
+                  </a>
+                  <a href="https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/" target="_blank" rel="noreferrer" className="btn-icon" aria-label="LinkedIn">
+                    <FaLinkedinIn size={16} />
+                  </a>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </>
   )
 }
-
-export default Navbar

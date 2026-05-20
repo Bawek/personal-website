@@ -4,22 +4,14 @@ const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
-// GET /api/contact - Get contact settings for the authenticated user
-router.get('/', authenticate, async (req, res) => {
+// GET /api/contact - Get contact settings (public, returns first available)
+router.get('/', async (req, res) => {
   try {
-    let contact = await Contact.findOne({ createdBy: req.user.id });
-    
-    // If no contact section exists, create a default one
-    if (!contact) {
-      contact = new Contact({
-        createdBy: req.user.id
-      });
-      await contact.save();
-    }
+    const contact = await Contact.findOne().sort({ createdAt: 1 });
     
     res.json({
       success: true,
-      contact: contact
+      contact: contact || null
     });
   } catch (error) {
     console.error('Error fetching contact data:', error);

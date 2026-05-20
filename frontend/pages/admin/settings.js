@@ -1,439 +1,154 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import { motion } from 'framer-motion';
-import Link from 'next/link';
-import AuthProtection from '@/components/AuthProtection';
+import { useState, useEffect } from 'react'
+import axios from 'axios'
+import { motion } from 'framer-motion'
+import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
+import AdminLayout from '@/components/AdminLayout'
+import AuthProtection from '@/components/AuthProtection'
+
+const INPUT_CLS = "admin-input"
+const LABEL_CLS = "block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2"
+
+const Toggle = ({ label, desc, checked, onChange }) => (
+  <label className="flex items-start gap-3 cursor-pointer group">
+    <div className="relative mt-0.5 flex-shrink-0">
+      <input type="checkbox" checked={checked} onChange={onChange} className="sr-only peer" />
+      <div className="w-9 h-5 bg-white/10 rounded-full peer-checked:bg-violet-500 transition-colors" />
+      <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
+    </div>
+    <div>
+      <p className="text-sm font-medium text-gray-300 group-hover:text-white transition-colors">{label}</p>
+      {desc && <p className="text-xs text-gray-600 mt-0.5">{desc}</p>}
+    </div>
+  </label>
+)
 
 function SettingsContent() {
-  const [settings, setSettings] = useState({
-    siteName: '',
-    siteDescription: '',
-    contactInfo: {
-      email: '',
-      phone: '',
-      address: '',
-      socialLinks: []
-    },
-    seo: {
-      metaTitle: '',
-      metaDescription: '',
-      keywords: []
-    },
-    theme: {
-      primaryColor: '#3B82F6',
-      secondaryColor: '#10B981',
-      fontFamily: 'Inter'
-    },
-    features: {
-      blog: { enabled: true, postsPerPage: 6 },
-      portfolio: { enabled: true, projectsPerPage: 9 },
-      contact: { enabled: true, emailService: '' },
-      analytics: { enabled: false }
-    },
-    languages: {
-      default: 'en',
-      supported: [
-        { code: 'en', name: 'English', flag: 'US' },
-        { code: 'am', name: 'Amharic', flag: 'ET' },
-        { code: 'es', name: 'Español', flag: 'ES' }
-      ]
-    }
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const router = useRouter();
+  const [settings, setSettings] = useState({ siteName: '', siteDescription: '', contactInfo: { email: '', phone: '', address: '' }, seo: { metaTitle: '', metaDescription: '', keywords: [] }, theme: { primaryColor: '#8B5CF6', secondaryColor: '#EC4899', fontFamily: 'Inter' }, features: { blog: { enabled: true }, portfolio: { enabled: true }, contact: { enabled: true }, analytics: { enabled: false } } })
+  const [loading, setLoading] = useState(false)
+  const [status, setStatus]   = useState(null)
 
   useEffect(() => {
-    fetchSettings();
-  }, []);
+    axios.get('/api/settings').then(({ data }) => { if (data.settings) setSettings(data.settings) }).catch(() => {})
+  }, [])
 
-  const fetchSettings = async () => {
-    try {
-      const response = await axios.get('/api/settings');
-      setSettings(response.data.settings);
-    } catch (error) {
-      console.error('Error fetching settings:', error);
-    }
-  };
+  const set = (path, value) => {
+    const keys = path.split('.')
+    setSettings(prev => {
+      const next = { ...prev }
+      let cur = next
+      for (let i = 0; i < keys.length - 1; i++) { cur[keys[i]] = { ...cur[keys[i]] }; cur = cur[keys[i]] }
+      cur[keys[keys.length - 1]] = value
+      return next
+    })
+  }
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
+    e.preventDefault(); setLoading(true); setStatus(null)
     try {
-      const response = await axios.put('/api/settings', settings);
-      setSettings(response.data.settings);
-      console.log('Settings updated successfully');
-    } catch (error) {
-      setError(error.response?.data?.message || 'Failed to update settings');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setSettings(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
-        }
-      }));
-    } else {
-      setSettings(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-  };
+      const token = localStorage.getItem('token')
+      await axios.put('/api/settings', settings, { headers: { Authorization: `Bearer ${token}` } })
+      setStatus('ok')
+    } catch { setStatus('err') }
+    finally { setLoading(false) }
+  }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/admin/dashboard" className="text-gray-600 hover:text-gray-900">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </Link>
-              <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
-            </div>
+    <div className="space-y-6 max-w-3xl">
+      <div>
+        <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">Manage</p>
+        <h1 className="text-2xl font-bold text-white">Settings</h1>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* General */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+          <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">General</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div><label className={LABEL_CLS}>Site Name</label><input value={settings.siteName} onChange={e => set('siteName', e.target.value)} placeholder="My Portfolio" className={INPUT_CLS} /></div>
+            <div><label className={LABEL_CLS}>Site Description</label><input value={settings.siteDescription} onChange={e => set('siteDescription', e.target.value)} placeholder="Welcome to my site" className={INPUT_CLS} /></div>
           </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white rounded-lg shadow"
-        >
-          <div className="p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-6">Site Settings</h2>
-            
-            {error && (
-              <div className="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 00-8 8v6a2 2 0 002 2h10a2 2 0 002 2v2a2 2 0 002-2h2a2 2 0 002-2z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <p className="text-sm text-red-700">{error}</p>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6 p-6">
-            {/* Basic Information */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Site Name
-                </label>
-                <input
-                  type="text"
-                  name="siteName"
-                  value={settings.siteName}
-                  onChange={handleChange}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  placeholder="My Personal Website"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Site Description
-                </label>
-                <textarea
-                  name="siteDescription"
-                  value={settings.siteDescription}
-                  onChange={handleChange}
-                  rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  placeholder="Welcome to my personal website"
-                />
-              </div>
-            </div>
-
-            {/* Contact Information */}
-            <div className="space-y-6 mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Contact Information</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="contactInfo.email"
-                    value={settings.contactInfo.email}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    placeholder="contact@example.com"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Phone
-                  </label>
-                  <input
-                    type="tel"
-                    name="contactInfo.phone"
-                    value={settings.contactInfo.phone}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    placeholder="+1234567890"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Address
-                  </label>
-                  <textarea
-                    name="contactInfo.address"
-                    value={settings.contactInfo.address}
-                    onChange={handleChange}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    placeholder="Your City, Country"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Theme Settings */}
-            <div className="space-y-6 mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Theme Settings</h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Primary Color
-                  </label>
-                  <input
-                    type="color"
-                    name="theme.primaryColor"
-                    value={settings.theme.primaryColor}
-                    onChange={handleChange}
-                    className="w-full h-10 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Secondary Color
-                  </label>
-                  <input
-                    type="color"
-                    name="theme.secondaryColor"
-                    value={settings.theme.secondaryColor}
-                    onChange={handleChange}
-                    className="w-full h-10 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Font Family
-                  </label>
-                  <select
-                    name="theme.fontFamily"
-                    value={settings.theme.fontFamily}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                  >
-                    <option value="Inter">Inter</option>
-                    <option value="Arial">Arial</option>
-                    <option value="Georgia">Georgia</option>
-                    <option value="Times New Roman">Times New Roman</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
-            {/* SEO Settings */}
-            <div className="space-y-6 mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">SEO Settings</h3>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Meta Title
-                  </label>
-                  <input
-                    type="text"
-                    name="seo.metaTitle"
-                    value={settings.seo.metaTitle}
-                    onChange={handleChange}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    placeholder="My Personal Website"
-                    maxLength={60}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Meta Description
-                  </label>
-                  <textarea
-                    name="seo.metaDescription"
-                    value={settings.seo.metaDescription}
-                    onChange={handleChange}
-                    rows={3}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    placeholder="Welcome to my personal website"
-                    maxLength={160}
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Keywords
-                  </label>
-                  <input
-                    type="text"
-                    name="seo.keywords"
-                    value={settings.seo.keywords.join(', ')}
-                    onChange={(e) => {
-                      const keywords = e.target.value.split(',').map(k => k.trim()).filter(k => k);
-                      handleChange({ target: { name: 'seo.keywords', value: keywords } });
-                    }}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                    placeholder="portfolio, web development, react"
-                  />
-                  <p className="mt-1 text-xs text-gray-500">Separate keywords with commas</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Feature Settings */}
-            <div className="space-y-6 mb-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">Feature Settings</h3>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      name="features.blog.enabled"
-                      checked={settings.features.blog.enabled}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Enable Blog</span>
-                      <span className="text-xs text-gray-500">({settings.features.blog.postsPerPage} posts per page)</span>
-                    </div>
-                  </label>
-                  
-                  <label className="flex items-center space-x-3">
-                    <input
-                      type="checkbox"
-                      name="features.portfolio.enabled"
-                      checked={settings.features.portfolio.enabled}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                    <div>
-                      <span className="text-sm font-medium text-gray-700">Enable Portfolio</span>
-                      <span className="text-xs text-gray-500">({settings.features.portfolio.projectsPerPage} projects per page)</span>
-                    </div>
-                  </label>
-                    
-                    {settings.features.portfolio.enabled && (
-                      <div className="ml-7">
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Projects Per Page
-                        </label>
-                        <input
-                          type="number"
-                          name="features.portfolio.projectsPerPage"
-                          value={settings.features.portfolio.projectsPerPage}
-                          onChange={handleChange}
-                          min="1"
-                          max="20"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-                        />
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        name="features.contact.enabled"
-                        checked={settings.features.contact.enabled}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Enable Contact</span>
-                      </div>
-                    </label>
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="flex items-center space-x-3">
-                      <input
-                        type="checkbox"
-                        name="features.analytics.enabled"
-                        checked={settings.features.analytics.enabled}
-                        onChange={handleChange}
-                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                      />
-                      <div>
-                        <span className="text-sm font-medium text-gray-700">Enable Analytics</span>
-                      </div>
-                    </label>
-                  </div>
-                </div>
-              </div>
-
-              {/* Actions */}
-              <div className="flex justify-end space-x-4 pt-6 border-t">
-                <Link 
-                  href="/admin/dashboard"
-                  className="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition"
-                >
-                  Back to Dashboard
-                </Link>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Saving...' : 'Save Settings'}
-                </button>
-              </div>
-            </form>
         </motion.div>
-      </main>
+
+        {/* Contact info */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.05 }}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+          <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">Contact Info</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div><label className={LABEL_CLS}>Email</label><input type="email" value={settings.contactInfo?.email || ''} onChange={e => set('contactInfo.email', e.target.value)} placeholder="you@example.com" className={INPUT_CLS} /></div>
+            <div><label className={LABEL_CLS}>Phone</label><input value={settings.contactInfo?.phone || ''} onChange={e => set('contactInfo.phone', e.target.value)} placeholder="+251…" className={INPUT_CLS} /></div>
+            <div className="sm:col-span-2"><label className={LABEL_CLS}>Address</label><input value={settings.contactInfo?.address || ''} onChange={e => set('contactInfo.address', e.target.value)} placeholder="Addis Ababa, Ethiopia" className={INPUT_CLS} /></div>
+          </div>
+        </motion.div>
+
+        {/* SEO */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+          <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">SEO</h2>
+          <div><label className={LABEL_CLS}>Meta Title <span className="text-gray-600 normal-case">(max 60 chars)</span></label><input maxLength={60} value={settings.seo?.metaTitle || ''} onChange={e => set('seo.metaTitle', e.target.value)} placeholder="Baweke | Software Engineer" className={INPUT_CLS} /></div>
+          <div><label className={LABEL_CLS}>Meta Description <span className="text-gray-600 normal-case">(max 160 chars)</span></label><textarea maxLength={160} rows={2} value={settings.seo?.metaDescription || ''} onChange={e => set('seo.metaDescription', e.target.value)} placeholder="Personal portfolio of…" className={`${INPUT_CLS} resize-none`} /></div>
+          <div><label className={LABEL_CLS}>Keywords <span className="text-gray-600 normal-case">(comma-separated)</span></label><input value={(settings.seo?.keywords || []).join(', ')} onChange={e => set('seo.keywords', e.target.value.split(',').map(k => k.trim()).filter(Boolean))} placeholder="portfolio, react, developer" className={INPUT_CLS} /></div>
+        </motion.div>
+
+        {/* Theme */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+          <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">Theme</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div>
+              <label className={LABEL_CLS}>Primary Color</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.theme?.primaryColor || '#8B5CF6'} onChange={e => set('theme.primaryColor', e.target.value)} className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                <span className="text-xs text-gray-500 font-mono">{settings.theme?.primaryColor}</span>
+              </div>
+            </div>
+            <div>
+              <label className={LABEL_CLS}>Secondary Color</label>
+              <div className="flex items-center gap-2">
+                <input type="color" value={settings.theme?.secondaryColor || '#EC4899'} onChange={e => set('theme.secondaryColor', e.target.value)} className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                <span className="text-xs text-gray-500 font-mono">{settings.theme?.secondaryColor}</span>
+              </div>
+            </div>
+            <div>
+              <label className={LABEL_CLS}>Font</label>
+              <select value={settings.theme?.fontFamily || 'Inter'} onChange={e => set('theme.fontFamily', e.target.value)}
+                className="admin-select">
+                {['Inter','Roboto','Poppins','Georgia','Fira Code'].map(f => <option key={f} value={f}>{f}</option>)}
+              </select>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Features */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+          <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">Features</h2>
+          <div className="space-y-4">
+            <Toggle label="Blog" desc="Enable the blog section" checked={settings.features?.blog?.enabled ?? true} onChange={e => set('features.blog.enabled', e.target.checked)} />
+            <Toggle label="Portfolio" desc="Enable the projects section" checked={settings.features?.portfolio?.enabled ?? true} onChange={e => set('features.portfolio.enabled', e.target.checked)} />
+            <Toggle label="Contact Form" desc="Allow visitors to send messages" checked={settings.features?.contact?.enabled ?? true} onChange={e => set('features.contact.enabled', e.target.checked)} />
+            <Toggle label="Analytics" desc="Enable analytics tracking" checked={settings.features?.analytics?.enabled ?? false} onChange={e => set('features.analytics.enabled', e.target.checked)} />
+          </div>
+        </motion.div>
+
+        {status === 'ok'  && <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm"><HiCheckCircle size={16} /> Settings saved</div>}
+        {status === 'err' && <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"><HiXCircle size={16} /> Failed to save</div>}
+
+        <button type="submit" disabled={loading}
+          className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold hover:from-violet-400 hover:to-pink-400 transition-all shadow-lg shadow-violet-500/25 disabled:opacity-50">
+          {loading ? 'Saving…' : 'Save Settings'}
+        </button>
+      </form>
     </div>
-  );
+  )
 }
 
 export default function AdminSettings() {
   return (
     <AuthProtection requireAuth={true}>
-      <SettingsContent />
+      <AdminLayout title="Settings">
+        <SettingsContent />
+      </AdminLayout>
     </AuthProtection>
-  );
+  )
 }

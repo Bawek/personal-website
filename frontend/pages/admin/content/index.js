@@ -1,250 +1,179 @@
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
-import axios from 'axios';
-import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { useState, useEffect, useCallback } from 'react'
+import { useRouter } from 'next/router'
+import axios from 'axios'
+import Link from 'next/link'
+import { motion } from 'framer-motion'
+import { HiPlus, HiPencil, HiTrash, HiSearch, HiEye, HiDocumentText } from 'react-icons/hi'
+import AdminLayout from '@/components/AdminLayout'
+import AuthProtection from '@/components/AuthProtection'
 
-export default function ContentManagement() {
-  const [content, setContent] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({
-    type: '',
-    status: '',
-    search: '',
-    page: 1,
-    limit: 10
-  });
-  const [pagination, setPagination] = useState({});
-  const router = useRouter();
+const TYPE_COLORS = {
+  page:        'bg-blue-500/10    text-blue-400    border-blue-500/20',
+  post:        'bg-violet-500/10  text-violet-400  border-violet-500/20',
+  project:     'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  service:     'bg-cyan-500/10    text-cyan-400    border-cyan-500/20',
+  testimonial: 'bg-pink-500/10    text-pink-400    border-pink-500/20',
+  skill:       'bg-amber-500/10   text-amber-400   border-amber-500/20',
+}
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      router.push('/admin/login');
-      return;
-    }
-    fetchContent();
-  }, [router, filters]);
+const STATUS_COLORS = {
+  published: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
+  draft:     'bg-amber-500/10   text-amber-400   border-amber-500/20',
+  archived:  'bg-gray-500/10    text-gray-400    border-gray-500/20',
+}
 
-  const fetchContent = async () => {
+function ContentList() {
+  const [items, setItems]         = useState([])
+  const [loading, setLoading]     = useState(true)
+  const [pagination, setPagination] = useState({})
+  const [filters, setFilters]     = useState({ type: '', status: 'published', search: '', page: 1, limit: 10 })
+
+  const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` })
+
+  const fetchContent = useCallback(async () => {
+    setLoading(true)
     try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-      
-      const params = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) params.append(key, value);
-      });
+      const params = new URLSearchParams()
+      Object.entries(filters).forEach(([k, v]) => { if (v) params.append(k, v) })
+      const { data } = await axios.get(`/api/content?${params}`, { headers: headers() })
+      setItems(data.contents || [])
+      setPagination(data.pagination || {})
+    } catch { setItems([]) }
+    finally { setLoading(false) }
+  }, [filters])
 
-      const response = await axios.get(`/api/content?${params}`, { headers });
-      setContent(response.data.contents);
-      setPagination(response.data.pagination);
-    } catch (error) {
-      console.error('Content fetch error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  useEffect(() => { fetchContent() }, [fetchContent])
 
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [key]: value,
-      page: key === 'page' ? value : 1 // Reset page when other filters change
-    }));
-  };
+  const setFilter = (key, value) => setFilters(prev => ({ ...prev, [key]: value, page: key === 'page' ? value : 1 }))
 
   const handleDelete = async (id) => {
-    if (!confirm('Are you sure you want to delete this content?')) return;
-
-    try {
-      const token = localStorage.getItem('token');
-      const headers = { Authorization: `Bearer ${token}` };
-      
-      await axios.delete(`/api/content/${id}`, { headers });
-      fetchContent(); // Refresh content list
-    } catch (error) {
-      console.error('Delete error:', error);
-      alert('Failed to delete content');
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading content...</p>
-        </div>
-      </div>
-    );
+    if (!confirm('Delete this content permanently?')) return
+    try { await axios.delete(`/api/content/${id}`, { headers: headers() }); fetchContent() }
+    catch { alert('Failed to delete') }
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="space-y-6">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-4">
-              <Link href="/admin/dashboard" className="text-gray-600 hover:text-gray-900">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </Link>
-              <h1 className="text-2xl font-bold text-gray-900">Content Management</h1>
-            </div>
-            <Link href="/admin/content/new" className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition">
-                Create New Content
+      <div className="flex items-center justify-between">
+        <div>
+          <p className="text-xs font-mono text-gray-500 uppercase tracking-widest mb-1">CMS</p>
+          <h1 className="text-2xl font-bold text-white">Content</h1>
+          <p className="text-sm text-gray-500 mt-1">Blog posts, pages, services, testimonials</p>
+        </div>
+        <Link href="/admin/content/new"
+          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold hover:from-violet-400 hover:to-pink-400 transition-all shadow-lg shadow-violet-500/25">
+          <HiPlus size={16} /> New Content
+        </Link>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl p-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          {/* Search */}
+          <div className="relative">
+            <HiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" />
+            <input
+              type="text"
+              value={filters.search}
+              onChange={e => setFilter('search', e.target.value)}
+              placeholder="Search…"
+              className="admin-input pl-9"
+            />
+          </div>
+
+          {/* Type */}
+          <select value={filters.type} onChange={e => setFilter('type', e.target.value)} className="admin-select">
+            <option value="">All Types</option>
+            <option value="page">Page</option>
+            <option value="post">Blog Post</option>
+            <option value="project">Project</option>
+            <option value="service">Service</option>
+            <option value="testimonial">Testimonial</option>
+            <option value="skill">Skill</option>
+          </select>
+
+          {/* Status */}
+          <select value={filters.status} onChange={e => setFilter('status', e.target.value)} className="admin-select">
+            <option value="">All Status</option>
+            <option value="published">Published</option>
+            <option value="draft">Draft</option>
+            <option value="archived">Archived</option>
+          </select>
+
+          {/* Per page */}
+          <select value={filters.limit} onChange={e => setFilter('limit', e.target.value)} className="admin-select">
+            <option value="10">10 per page</option>
+            <option value="25">25 per page</option>
+            <option value="50">50 per page</option>
+          </select>
+        </div>
+      </div>
+
+      {/* Table */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+        {loading ? (
+          <div className="flex justify-center py-16">
+            <div className="w-8 h-8 border-2 border-violet-500/30 border-t-violet-500 rounded-full animate-spin" />
+          </div>
+        ) : items.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-16 text-gray-600">
+            <HiDocumentText size={32} className="mb-3 opacity-40" />
+            <p className="text-sm mb-1">No content found</p>
+            <p className="text-xs text-gray-700">Try changing the filters or create new content</p>
+            <Link href="/admin/content/new" className="mt-4 text-xs text-violet-400 hover:text-violet-300 flex items-center gap-1">
+              <HiPlus size={12} /> Create your first content
             </Link>
           </div>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="bg-white rounded-lg shadow p-6 mb-6"
-        >
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Search</label>
-              <input
-                type="text"
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                placeholder="Search content..."
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Type</label>
-              <select
-                value={filters.type}
-                onChange={(e) => handleFilterChange('type', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              >
-                <option value="">All Types</option>
-                <option value="page">Page</option>
-                <option value="post">Post</option>
-                <option value="project">Project</option>
-                <option value="service">Service</option>
-                <option value="testimonial">Testimonial</option>
-                <option value="skill">Skill</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
-              <select
-                value={filters.status}
-                onChange={(e) => handleFilterChange('status', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              >
-                <option value="">All Status</option>
-                <option value="published">Published</option>
-                <option value="draft">Draft</option>
-                <option value="archived">Archived</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Per Page</label>
-              <select
-                value={filters.limit}
-                onChange={(e) => handleFilterChange('limit', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-              </select>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Content Table */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="bg-white rounded-lg shadow overflow-hidden"
-        >
-          {content.length === 0 ? (
-            <div className="text-center py-12">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-              </svg>
-              <h3 className="mt-2 text-sm font-medium text-gray-900">No content found</h3>
-              <p className="mt-1 text-sm text-gray-500">Get started by creating new content.</p>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Title
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Type
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Author
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Created
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Actions
-                    </th>
+        ) : (
+          <>
+            {/* Desktop table */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/5">
+                    <th className="px-5 py-3 text-left text-xs font-mono text-gray-500 uppercase tracking-widest">Title</th>
+                    <th className="px-5 py-3 text-left text-xs font-mono text-gray-500 uppercase tracking-widest">Type</th>
+                    <th className="px-5 py-3 text-left text-xs font-mono text-gray-500 uppercase tracking-widest">Status</th>
+                    <th className="px-5 py-3 text-left text-xs font-mono text-gray-500 uppercase tracking-widest">Lang</th>
+                    <th className="px-5 py-3 text-left text-xs font-mono text-gray-500 uppercase tracking-widest">Date</th>
+                    <th className="px-5 py-3 text-left text-xs font-mono text-gray-500 uppercase tracking-widest">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
-                  {content.map((item) => (
-                    <tr key={item._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{item.title}</div>
-                          <div className="text-sm text-gray-500">/{item.slug}</div>
-                        </div>
+                <tbody className="divide-y divide-white/5">
+                  {items.map((item) => (
+                    <tr key={item._id} className="hover:bg-white/3 transition-colors group">
+                      <td className="px-5 py-3.5">
+                        <p className="text-sm font-medium text-gray-200 truncate max-w-[220px]">{item.title}</p>
+                        <p className="text-xs text-gray-600 font-mono mt-0.5">/{item.slug}</p>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                      <td className="px-5 py-3.5">
+                        <span className={`px-2 py-0.5 text-xs rounded-full border font-mono capitalize ${TYPE_COLORS[item.type] || ''}`}>
                           {item.type}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                          item.status === 'published' 
-                            ? 'bg-green-100 text-green-800'
-                            : item.status === 'draft'
-                            ? 'bg-yellow-100 text-yellow-800'
-                            : 'bg-gray-100 text-gray-800'
-                        }`}>
+                      <td className="px-5 py-3.5">
+                        <span className={`px-2 py-0.5 text-xs rounded-full border font-mono capitalize ${STATUS_COLORS[item.status] || ''}`}>
                           {item.status}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {item.author?.username || 'Unknown'}
+                      <td className="px-5 py-3.5">
+                        <span className="text-xs text-gray-500 font-mono uppercase">{item.language}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {new Date(item.createdAt).toLocaleDateString()}
+                      <td className="px-5 py-3.5">
+                        <span className="text-xs text-gray-500">{new Date(item.createdAt).toLocaleDateString()}</span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <div className="flex items-center space-x-2">
-                          <Link href={`/admin/content/edit/${item._id}`} className="text-blue-600 hover:text-blue-900">
-                            Edit
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Link href={`/admin/content/edit/${item._id}`}
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 transition-all"
+                            aria-label="Edit">
+                            <HiPencil size={14} />
                           </Link>
-                          <button
-                            onClick={() => handleDelete(item._id)}
-                            className="text-red-600 hover:text-red-900"
-                          >
-                            Delete
+                          <button onClick={() => handleDelete(item._id)}
+                            className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all"
+                            aria-label="Delete">
+                            <HiTrash size={14} />
                           </button>
                         </div>
                       </td>
@@ -253,73 +182,64 @@ export default function ContentManagement() {
                 </tbody>
               </table>
             </div>
-          )}
 
-          {/* Pagination */}
-          {pagination.pages > 1 && (
-            <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
-              <div className="flex-1 flex justify-between sm:hidden">
-                <button
-                  onClick={() => handleFilterChange('page', pagination.page - 1)}
-                  disabled={pagination.page === 1}
-                  className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Previous
-                </button>
-                <button
-                  onClick={() => handleFilterChange('page', pagination.page + 1)}
-                  disabled={pagination.page === pagination.pages}
-                  className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50"
-                >
-                  Next
-                </button>
-              </div>
-              <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm text-gray-700">
-                    Showing <span className="font-medium">{(pagination.page - 1) * pagination.limit + 1}</span> to{' '}
-                    <span className="font-medium">
-                      {Math.min(pagination.page * pagination.limit, pagination.total)}
-                    </span>{' '}
-                    of <span className="font-medium">{pagination.total}</span> results
-                  </p>
+            {/* Mobile cards */}
+            <div className="md:hidden divide-y divide-white/5">
+              {items.map((item) => (
+                <div key={item._id} className="p-4 flex items-start justify-between gap-3">
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-medium text-gray-200 truncate">{item.title}</p>
+                    <p className="text-xs text-gray-600 font-mono mt-0.5">/{item.slug}</p>
+                    <div className="flex gap-2 mt-2">
+                      <span className={`px-2 py-0.5 text-xs rounded-full border font-mono capitalize ${TYPE_COLORS[item.type] || ''}`}>{item.type}</span>
+                      <span className={`px-2 py-0.5 text-xs rounded-full border font-mono capitalize ${STATUS_COLORS[item.status] || ''}`}>{item.status}</span>
+                    </div>
+                  </div>
+                  <div className="flex gap-1.5 flex-shrink-0">
+                    <Link href={`/admin/content/edit/${item._id}`} className="p-1.5 rounded-lg text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 transition-all"><HiPencil size={14} /></Link>
+                    <button onClick={() => handleDelete(item._id)} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all"><HiTrash size={14} /></button>
+                  </div>
                 </div>
-                <div>
-                  <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
-                    <button
-                      onClick={() => handleFilterChange('page', pagination.page - 1)}
-                      disabled={pagination.page === 1}
-                      className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Previous
-                    </button>
-                    {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((page) => (
-                      <button
-                        key={page}
-                        onClick={() => handleFilterChange('page', page)}
-                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
-                          page === pagination.page
-                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
-                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                        }`}
-                      >
-                        {page}
-                      </button>
-                    ))}
-                    <button
-                      onClick={() => handleFilterChange('page', pagination.page + 1)}
-                      disabled={pagination.page === pagination.pages}
-                      className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50"
-                    >
-                      Next
-                    </button>
-                  </nav>
-                </div>
-              </div>
+              ))}
             </div>
-          )}
-        </motion.div>
-      </main>
+
+            {/* Pagination */}
+            {pagination.pages > 1 && (
+              <div className="flex items-center justify-between px-5 py-3 border-t border-white/5">
+                <p className="text-xs text-gray-500">
+                  {(pagination.page - 1) * pagination.limit + 1}–{Math.min(pagination.page * pagination.limit, pagination.total)} of {pagination.total}
+                </p>
+                <div className="flex gap-1">
+                  <button onClick={() => setFilter('page', pagination.page - 1)} disabled={pagination.page === 1}
+                    className="px-3 py-1.5 text-xs rounded-lg border border-white/10 text-gray-400 hover:border-white/20 hover:text-white transition-all disabled:opacity-30">
+                    Prev
+                  </button>
+                  {Array.from({ length: Math.min(pagination.pages, 5) }, (_, i) => i + 1).map(p => (
+                    <button key={p} onClick={() => setFilter('page', p)}
+                      className={`px-3 py-1.5 text-xs rounded-lg border transition-all ${p === pagination.page ? 'bg-violet-500/20 border-violet-500/50 text-violet-300' : 'border-white/10 text-gray-500 hover:border-white/20 hover:text-white'}`}>
+                      {p}
+                    </button>
+                  ))}
+                  <button onClick={() => setFilter('page', pagination.page + 1)} disabled={pagination.page === pagination.pages}
+                    className="px-3 py-1.5 text-xs rounded-lg border border-white/10 text-gray-400 hover:border-white/20 hover:text-white transition-all disabled:opacity-30">
+                    Next
+                  </button>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
-  );
+  )
+}
+
+export default function AdminContent() {
+  return (
+    <AuthProtection requireAuth={true}>
+      <AdminLayout title="Content">
+        <ContentList />
+      </AdminLayout>
+    </AuthProtection>
+  )
 }
