@@ -5,12 +5,12 @@ import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'
 import { motion, AnimatePresence } from 'framer-motion'
 
 const NAV_LINKS = [
-  { label: 'About',      href: '/#about'    },
-  { label: 'Experience', href: '/#experience'},
-  { label: 'Skills',     href: '/#skills'   },
-  { label: 'Projects',   href: '/#projects' },
-  { label: 'Blog',       href: '/blog'      },
-  { label: 'Contact',    href: '/#contact'  },
+  { label: 'About',      href: '/about'      },
+  { label: 'Experience', href: '/experience' },
+  { label: 'Skills',     href: '/skills'     },
+  { label: 'Projects',   href: '/projects'   },
+  { label: 'Blog',       href: '/blog'       },
+  { label: 'Contact',    href: '/contact'    },
 ]
 
 export default function Navbar() {
@@ -83,9 +83,9 @@ export default function Navbar() {
             >
               <FaLinkedinIn size={16} />
             </a>
-            <a href="/#contact" className="btn-primary text-xs py-2 px-4">
+            <Link href="/contact" className="btn-primary text-xs py-2 px-4">
               Hire Me
-            </a>
+            </Link>
           </div>
 
           {/* Mobile hamburger */}

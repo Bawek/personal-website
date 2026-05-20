@@ -45,21 +45,21 @@ function ProjectsContent() {
       } else {
         projectData.imageUrl = form.imageUrl; body = projectData
       }
-      if (editing) await axios.put(`/api/projects/${editing._id}`, body, { headers: hdrs })
+      if (editing) await axios.put(`/api/projects/${editing.slug}`, body, { headers: hdrs })
       else         await axios.post('/api/projects', body, { headers: hdrs })
       await fetchProjects(); closeForm()
     } catch (err) { setError(err.response?.data?.message || 'Failed to save') }
     finally { setSaving(false) }
   }
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (slug) => {
     if (!confirm('Delete this project?')) return
-    try { await axios.delete(`/api/projects/${id}`, { headers: headers() }); await fetchProjects() }
+    try { await axios.delete(`/api/projects/${slug}`, { headers: headers() }); await fetchProjects() }
     catch { setError('Failed to delete') }
   }
 
-  const toggleFeatured = async (id) => {
-    try { await axios.patch(`/api/projects/${id}/toggle-featured`, {}, { headers: headers() }); await fetchProjects() }
+  const toggleFeatured = async (slug) => {
+    try { await axios.patch(`/api/projects/${slug}/toggle-featured`, {}, { headers: headers() }); await fetchProjects() }
     catch { setError('Failed to update') }
   }
 
@@ -195,9 +195,9 @@ function ProjectsContent() {
                     {p.githubUrl && <a href={p.githubUrl} target="_blank" rel="noreferrer" className="text-gray-500 hover:text-white transition-colors" aria-label="GitHub"><FaGithub size={14} /></a>}
                   </div>
                   <div className="flex gap-1.5">
-                    <button onClick={() => toggleFeatured(p._id)} className={`p-1.5 rounded-lg transition-all ${p.featured ? 'text-amber-400 bg-amber-500/10' : 'text-gray-600 hover:text-amber-400 hover:bg-amber-500/10'}`} aria-label="Toggle featured"><HiStar size={14} /></button>
+                    <button onClick={() => toggleFeatured(p.slug)} className={`p-1.5 rounded-lg transition-all ${p.featured ? 'text-amber-400 bg-amber-500/10' : 'text-gray-600 hover:text-amber-400 hover:bg-amber-500/10'}`} aria-label="Toggle featured"><HiStar size={14} /></button>
                     <button onClick={() => openEdit(p)} className="p-1.5 rounded-lg text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 transition-all" aria-label="Edit"><HiPencil size={14} /></button>
-                    <button onClick={() => handleDelete(p._id)} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all" aria-label="Delete"><HiTrash size={14} /></button>
+                    <button onClick={() => handleDelete(p.slug)} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all" aria-label="Delete"><HiTrash size={14} /></button>
                   </div>
                 </div>
               </div>

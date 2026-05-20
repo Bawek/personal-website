@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 
@@ -21,56 +22,58 @@ function SkillCard({ skill, index }) {
   const barWidth = LEVEL_WIDTH[skill.level] || LEVEL_WIDTH.intermediate
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.04 }}
-      className="glass-card p-4 hover:border-violet-500/30 transition-all duration-300 group"
-    >
-      <div className="flex items-center gap-3 mb-3">
-        {/* Icon placeholder — gradient initial */}
-        <div
-          className={`w-9 h-9 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}
-          aria-hidden="true"
-        >
-          {skill.name.charAt(0).toUpperCase()}
+    <Link href={`/skills/${skill.slug}`}>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.4, delay: index * 0.04 }}
+        className="glass-card p-4 hover:border-violet-500/30 transition-all duration-300 group h-full"
+      >
+        <div className="flex items-center gap-3 mb-3">
+          {/* Icon placeholder — gradient initial */}
+          <div
+            className={`w-9 h-9 rounded-lg bg-gradient-to-br ${gradient} flex items-center justify-center text-white text-sm font-bold flex-shrink-0`}
+            aria-hidden="true"
+          >
+            {skill.name.charAt(0).toUpperCase()}
+          </div>
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-white truncate group-hover:text-violet-400 transition-colors">{skill.name}</p>
+            <p className="text-xs text-gray-500 capitalize">{skill.category}</p>
+          </div>
         </div>
-        <div className="min-w-0">
-          <p className="text-sm font-medium text-white truncate">{skill.name}</p>
-          <p className="text-xs text-gray-500 capitalize">{skill.category}</p>
-        </div>
-      </div>
 
-      {/* Level bar */}
-      <div className="h-1 bg-white/5 rounded-full overflow-hidden">
-        <motion.div
-          initial={{ width: 0 }}
-          whileInView={{ width: '100%' }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: index * 0.04 + 0.2 }}
-          className={`h-full ${barWidth} bg-gradient-to-r ${gradient} rounded-full`}
-        />
-      </div>
-      <p className="text-xs text-gray-600 mt-1 capitalize font-mono">{skill.level}</p>
-    </motion.div>
+        {/* Level bar */}
+        <div className="h-1 bg-white/5 rounded-full overflow-hidden">
+          <motion.div
+            initial={{ width: 0 }}
+            whileInView={{ width: '100%' }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.8, delay: index * 0.04 + 0.2 }}
+            className={`h-full ${barWidth} bg-gradient-to-r ${gradient} rounded-full`}
+          />
+        </div>
+        <p className="text-xs text-gray-600 mt-1 capitalize font-mono">{skill.level}</p>
+      </motion.div>
+    </Link>
   )
 }
 
 // Fallback static skills when no DB data
 const FALLBACK_SKILLS = [
-  { _id: '1', name: 'React',      category: 'frontend', level: 'expert'       },
-  { _id: '2', name: 'Next.js',    category: 'frontend', level: 'advanced'     },
-  { _id: '3', name: 'JavaScript', category: 'frontend', level: 'expert'       },
-  { _id: '4', name: 'TypeScript', category: 'frontend', level: 'intermediate' },
-  { _id: '5', name: 'Tailwind',   category: 'frontend', level: 'advanced'     },
-  { _id: '6', name: 'Node.js',    category: 'backend',  level: 'advanced'     },
-  { _id: '7', name: 'MongoDB',    category: 'backend',  level: 'intermediate' },
-  { _id: '8', name: 'Express',    category: 'backend',  level: 'advanced'     },
-  { _id: '9', name: 'Git',        category: 'tools',    level: 'advanced'     },
-  { _id: '10', name: 'Redux',     category: 'frontend', level: 'advanced'     },
-  { _id: '11', name: 'HTML5',     category: 'frontend', level: 'expert'       },
-  { _id: '12', name: 'CSS3',      category: 'frontend', level: 'expert'       },
+  { _id: '1', slug: 'react',      name: 'React',      category: 'frontend', level: 'expert'       },
+  { _id: '2', slug: 'nextjs',     name: 'Next.js',    category: 'frontend', level: 'advanced'     },
+  { _id: '3', slug: 'javascript', name: 'JavaScript', category: 'frontend', level: 'expert'       },
+  { _id: '4', slug: 'typescript', name: 'TypeScript', category: 'frontend', level: 'intermediate' },
+  { _id: '5', slug: 'tailwind',   name: 'Tailwind',   category: 'frontend', level: 'advanced'     },
+  { _id: '6', slug: 'nodejs',     name: 'Node.js',    category: 'backend',  level: 'advanced'     },
+  { _id: '7', slug: 'mongodb',    name: 'MongoDB',    category: 'backend',  level: 'intermediate' },
+  { _id: '8', slug: 'express',    name: 'Express',    category: 'backend',  level: 'advanced'     },
+  { _id: '9', slug: 'git',        name: 'Git',        category: 'tools',    level: 'advanced'     },
+  { _id: '10', slug: 'redux',     name: 'Redux',     category: 'frontend', level: 'advanced'     },
+  { _id: '11', slug: 'html5',     name: 'HTML5',     category: 'frontend', level: 'expert'       },
+  { _id: '12', slug: 'css3',      name: 'CSS3',      category: 'frontend', level: 'expert'       },
 ]
 
 export default function Skills({ skills }) {

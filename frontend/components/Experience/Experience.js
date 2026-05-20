@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiLocationMarker, HiChevronDown, HiChevronUp } from 'react-icons/hi'
@@ -39,12 +40,12 @@ function ExperienceCard({ exp, index }) {
         aria-hidden="true"
       />
 
-      <div className="glass-card p-6 hover:border-violet-500/30 transition-colors duration-300">
+      <Link href={`/experience/${exp.slug}`} className="glass-card p-6 hover:border-violet-500/30 transition-colors duration-300 block">
         {/* Header */}
         <div className="flex flex-wrap items-start justify-between gap-3 mb-3">
           <div>
             <div className="flex flex-wrap items-center gap-2 mb-1">
-              <h3 className="text-white">{exp.title}</h3>
+              <h3 className="text-white hover:text-violet-400 transition-colors">{exp.title}</h3>
               {exp.current && (
                 <span className="px-2 py-0.5 text-xs rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 font-mono">
                   Current
@@ -93,7 +94,10 @@ function ExperienceCard({ exp, index }) {
             </ul>
             {hasMore && (
               <button
-                onClick={() => setExpanded(!expanded)}
+                onClick={(e) => {
+                  e.preventDefault()
+                  setExpanded(!expanded)
+                }}
                 className="mt-2 flex items-center gap-1 text-xs text-violet-400 hover:text-violet-300 transition-colors font-mono"
                 aria-expanded={expanded}
               >
@@ -115,7 +119,7 @@ function ExperienceCard({ exp, index }) {
             ))}
           </div>
         )}
-      </div>
+      </Link>
     </motion.div>
   )
 }

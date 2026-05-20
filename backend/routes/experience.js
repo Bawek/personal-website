@@ -23,10 +23,10 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/experience/:id - Get a single experience entry (public)
-router.get('/:id', async (req, res) => {
+// GET /api/experience/:slug - Get a single experience entry by slug (public)
+router.get('/:slug', async (req, res) => {
   try {
-    const experience = await Experience.findById(req.params.id);
+    const experience = await Experience.findOne({ slug: req.params.slug });
     
     if (!experience) {
       return res.status(404).json({
@@ -40,7 +40,7 @@ router.get('/:id', async (req, res) => {
       experience: experience
     });
   } catch (error) {
-    console.error('Error fetching experience:', error);
+    console.error('Error fetching experience by slug:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch experience'
@@ -96,11 +96,11 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
-// PUT /api/experience/:id - Update an experience entry
-router.put('/:id', authenticate, async (req, res) => {
+// PUT /api/experience/:slug - Update an experience entry by slug
+router.put('/:slug', authenticate, async (req, res) => {
   try {
     const experience = await Experience.findOne({ 
-      _id: req.params.id, 
+      slug: req.params.slug, 
       createdBy: req.user.id 
     });
     
@@ -158,11 +158,11 @@ router.put('/:id', authenticate, async (req, res) => {
   }
 });
 
-// DELETE /api/experience/:id - Delete an experience entry
-router.delete('/:id', authenticate, async (req, res) => {
+// DELETE /api/experience/:slug - Delete an experience entry by slug
+router.delete('/:slug', authenticate, async (req, res) => {
   try {
     const experience = await Experience.findOne({ 
-      _id: req.params.id, 
+      slug: req.params.slug, 
       createdBy: req.user.id 
     });
     
@@ -173,7 +173,7 @@ router.delete('/:id', authenticate, async (req, res) => {
       });
     }
     
-    await Experience.deleteOne({ _id: req.params.id });
+    await Experience.deleteOne({ slug: req.params.slug });
     
     res.json({
       success: true,

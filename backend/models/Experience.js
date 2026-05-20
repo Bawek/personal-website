@@ -6,6 +6,12 @@ const experienceSchema = new mongoose.Schema({
     required: true,
     trim: true
   },
+  slug: {
+    type: String,
+    required: true,
+    unique: true,
+    lowercase: true
+  },
   company: {
     type: String,
     required: true,
@@ -57,8 +63,22 @@ const experienceSchema = new mongoose.Schema({
   timestamps: true
 });
 
+// Create slug from title and company before saving
+experienceSchema.pre('save', function(next) {
+  if (this.isModified('title') || this.isModified('company')) {
+    if (!this.slug) {
+      this.slug = `${this.title} ${this.company}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+    }
+  }
+  next();
+});
+
 // Index for better query performance
 experienceSchema.index({ createdBy: 1, startDate: -1 });
 experienceSchema.index({ createdBy: 1, current: -1, startDate: -1 });
+experienceSchema.index({ slug: 1 });
 
 module.exports = mongoose.model('Experience', experienceSchema);

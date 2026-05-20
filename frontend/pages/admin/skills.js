@@ -42,16 +42,16 @@ function SkillsContent() {
   const handleSubmit = async (e) => {
     e.preventDefault(); setSaving(true); setError('')
     try {
-      if (editing) await axios.put(`/api/skills/${editing._id}`, form, { headers: headers() })
+      if (editing) await axios.put(`/api/skills/${editing.slug}`, form, { headers: headers() })
       else         await axios.post('/api/skills', form, { headers: headers() })
       await fetchSkills(); closeForm()
     } catch (err) { setError(err.response?.data?.message || 'Failed to save') }
     finally { setSaving(false) }
   }
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (slug) => {
     if (!confirm('Delete this skill?')) return
-    try { await axios.delete(`/api/skills/${id}`, { headers: headers() }); await fetchSkills() }
+    try { await axios.delete(`/api/skills/${slug}`, { headers: headers() }); await fetchSkills() }
     catch { setError('Failed to delete') }
   }
 
@@ -144,7 +144,7 @@ function SkillsContent() {
                   </div>
                   <div className="flex gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button onClick={() => openEdit(skill)} className="p-1.5 rounded-lg text-gray-500 hover:text-violet-400 hover:bg-violet-500/10 transition-all" aria-label="Edit"><HiPencil size={14} /></button>
-                    <button onClick={() => handleDelete(skill._id)} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all" aria-label="Delete"><HiTrash size={14} /></button>
+                    <button onClick={() => handleDelete(skill.slug)} className="p-1.5 rounded-lg text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-all" aria-label="Delete"><HiTrash size={14} /></button>
                   </div>
                 </motion.div>
               ))}
