@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiLockClosed, HiMail, HiEye, HiEyeOff } from 'react-icons/hi'
 import AuthProtection from '@/components/AuthProtection'
@@ -20,7 +20,7 @@ function LoginForm() {
     setLoading(true)
     setError('')
     try {
-      const { data } = await axios.post('/api/auth/login', form)
+      const { data } = await api.post('/auth/login', form)
       localStorage.setItem('token', data.token)
       localStorage.setItem('user', JSON.stringify(data.user))
       router.push('/admin/dashboard')

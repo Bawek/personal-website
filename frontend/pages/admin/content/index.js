@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/router'
-import axios from 'axios'
+import api from '@/lib/api'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { HiPlus, HiPencil, HiTrash, HiSearch, HiEye, HiDocumentText } from 'react-icons/hi'
@@ -35,7 +35,7 @@ function ContentList() {
     try {
       const params = new URLSearchParams()
       Object.entries(filters).forEach(([k, v]) => { if (v) params.append(k, v) })
-      const { data } = await axios.get(`/api/content?${params}`, { headers: headers() })
+      const { data } = await api.get(`/content?${params}`, { headers: headers() })
       setItems(data.contents || [])
       setPagination(data.pagination || {})
     } catch { setItems([]) }
@@ -48,7 +48,7 @@ function ContentList() {
 
   const handleDelete = async (id) => {
     if (!confirm('Delete this content permanently?')) return
-    try { await axios.delete(`/api/content/${id}`, { headers: headers() }); fetchContent() }
+    try { await api.delete(`/content/${id}`, { headers: headers() }); fetchContent() }
     catch { alert('Failed to delete') }
   }
 

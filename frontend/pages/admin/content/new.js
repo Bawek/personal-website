@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import axios from 'axios'
+import api from '@/lib/api'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { HiXCircle, HiArrowLeft } from 'react-icons/hi'
@@ -57,7 +57,7 @@ function NewContentForm() {
           keywords: form.seo.keywords ? form.seo.keywords.split(',').map(k => k.trim()).filter(Boolean) : []
         }
       }
-      await axios.post('/api/content', payload, { headers: { Authorization: `Bearer ${token}` } })
+      await api.post('/content', payload, { headers: { Authorization: `Bearer ${token}` } })
       router.push('/admin/content')
     } catch (err) {
       setError(err.response?.data?.message || err.response?.data?.errors?.[0]?.msg || 'Failed to create content')

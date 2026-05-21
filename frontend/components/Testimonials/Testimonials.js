@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import axios from 'axios'
+import api from '@/lib/api'
 
 export default function Testimonials() {
   const [items, setItems] = useState([])
@@ -9,7 +9,7 @@ export default function Testimonials() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const { data } = await axios.get('/api/content', {
+        const { data } = await api.get('/content', {
           params: { type: 'testimonial', status: 'published', limit: 6 },
         })
         setItems(data.contents || [])

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
@@ -28,7 +28,7 @@ function SettingsContent() {
   const [status, setStatus]   = useState(null)
 
   useEffect(() => {
-    axios.get('/api/settings').then(({ data }) => { if (data.settings) setSettings(data.settings) }).catch(() => {})
+    api.get('/settings').then(({ data }) => { if (data.settings) setSettings(data.settings) }).catch(() => {})
   }, [])
 
   const set = (path, value) => {
@@ -46,7 +46,7 @@ function SettingsContent() {
     e.preventDefault(); setLoading(true); setStatus(null)
     try {
       const token = localStorage.getItem('token')
-      await axios.put('/api/settings', settings, { headers: { Authorization: `Bearer ${token}` } })
+      await api.put('/settings', settings, { headers: { Authorization: `Bearer ${token}` } })
       setStatus('ok')
     } catch { setStatus('err') }
     finally { setLoading(false) }

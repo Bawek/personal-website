@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiPencil, HiTrash, HiPlus, HiX } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
@@ -27,7 +27,7 @@ function SkillsContent() {
 
   const fetchSkills = async () => {
     try {
-      const { data } = await axios.get('/api/skills', { headers: headers() })
+      const { data } = await api.get('/skills', { headers: headers() })
       setSkills(data.skills || [])
     } catch { setError('Failed to load skills') }
     finally { setLoading(false) }
@@ -42,8 +42,8 @@ function SkillsContent() {
   const handleSubmit = async (e) => {
     e.preventDefault(); setSaving(true); setError('')
     try {
-      if (editing) await axios.put(`/api/skills/${editing.slug}`, form, { headers: headers() })
-      else         await axios.post('/api/skills', form, { headers: headers() })
+      if (editing) await api.put(`/skills/${editing.slug}`, form, { headers: headers() })
+      else         await api.post('/skills', form, { headers: headers() })
       await fetchSkills(); closeForm()
     } catch (err) { setError(err.response?.data?.message || 'Failed to save') }
     finally { setSaving(false) }
@@ -51,7 +51,7 @@ function SkillsContent() {
 
   const handleDelete = async (slug) => {
     if (!confirm('Delete this skill?')) return
-    try { await axios.delete(`/api/skills/${slug}`, { headers: headers() }); await fetchSkills() }
+    try { await api.delete(`/skills/${slug}`, { headers: headers() }); await fetchSkills() }
     catch { setError('Failed to delete') }
   }
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiLockClosed, HiMail, HiUser, HiShieldCheck } from 'react-icons/hi'
 
@@ -25,7 +25,7 @@ export default function AdminRegister() {
     setLoading(true); setError('')
     try {
       const { confirmPassword, ...data } = form
-      const res = await axios.post('/api/auth/register', data)
+      const res = await api.post('/auth/register', data)
       localStorage.setItem('token', res.data.token)
       localStorage.setItem('user', JSON.stringify(res.data.user))
       router.push('/admin/dashboard')

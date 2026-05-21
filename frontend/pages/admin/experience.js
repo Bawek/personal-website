@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiPencil, HiTrash, HiPlus, HiX, HiLocationMarker } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
@@ -43,7 +43,7 @@ function ExperienceContent() {
 
   const fetchExp = async () => {
     try {
-      const { data } = await axios.get('/api/experience', { headers: headers() })
+      const { data } = await api.get('/experience', { headers: headers() })
       setExperiences(data.experiences || [])
     } catch {
       setError('Failed to load')
@@ -100,8 +100,8 @@ function ExperienceContent() {
         achievements: form.achievements.split('\n').map((s) => s.trim()).filter(Boolean),
         technologies: form.technologies.split(',').map((t) => t.trim()).filter(Boolean),
       }
-      if (editing) await axios.put(`/api/experience/${editing.slug}`, payload, { headers: headers() })
-      else await axios.post('/api/experience', payload, { headers: headers() })
+      if (editing) await api.put(`/experience/${editing.slug}`, payload, { headers: headers() })
+      else await api.post('/experience', payload, { headers: headers() })
       await fetchExp()
       closeForm()
     } catch (err) {
@@ -114,7 +114,7 @@ function ExperienceContent() {
   const handleDelete = async (slug) => {
     if (!confirm('Delete this entry?')) return
     try {
-      await axios.delete(`/api/experience/${slug}`, { headers: headers() })
+      await api.delete(`/experience/${slug}`, { headers: headers() })
       await fetchExp()
     } catch {
       setError('Failed to delete')

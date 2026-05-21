@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiCheckCircle, HiXCircle, HiTrash, HiCheck, HiMail } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
@@ -15,20 +15,20 @@ function ContactContent() {
   const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` })
 
   const fetchMessages = async () => {
-    try { const { data } = await axios.get('/api/contact/messages', { headers: headers() }); setMessages(data.messages || []) }
+    try { const { data } = await api.get('/contact/messages', { headers: headers() }); setMessages(data.messages || []) }
     catch {}
   }
 
   useEffect(() => { fetchMessages() }, [])
 
   const markRead = async (id) => {
-    try { await axios.patch(`/api/contact/messages/${id}/read`, {}, { headers: headers() }); await fetchMessages() }
+    try { await api.patch(`/contact/messages/${id}/read`, {}, { headers: headers() }); await fetchMessages() }
     catch {}
   }
 
   const deleteMsg = async (id) => {
     if (!confirm('Delete this message?')) return
-    try { await axios.delete(`/api/contact/messages/${id}`, { headers: headers() }); await fetchMessages() }
+    try { await api.delete(`/contact/messages/${id}`, { headers: headers() }); await fetchMessages() }
     catch {}
   }
 

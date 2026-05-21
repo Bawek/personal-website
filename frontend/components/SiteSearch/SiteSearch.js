@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { HiSearch, HiX } from 'react-icons/hi'
-import axios from 'axios'
+import api from '@/lib/api'
 
 export default function SiteSearch() {
   const [open, setOpen] = useState(false)
@@ -27,7 +27,7 @@ export default function SiteSearch() {
     const timer = setTimeout(async () => {
       setLoading(true)
       try {
-        const { data } = await axios.get('/api/content', {
+        const { data } = await api.get('/content', {
           params: { status: 'published', search: query.trim(), limit: 8 },
         })
         setResults(data.contents || [])

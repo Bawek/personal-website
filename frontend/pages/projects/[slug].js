@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import axios from 'axios'
+import api from '@/lib/api'
 import Navbar from '@/components/Navbar/Navbar'
 import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa'
 import { HiArrowLeft, HiStar } from 'react-icons/hi'
@@ -18,7 +18,7 @@ export default function ProjectDetail() {
     if (!slug) return
     const fetch = async () => {
       try {
-        const { data } = await axios.get(`/api/projects/${slug}`)
+        const { data } = await api.get(`/projects/${slug}`)
         setProject(data.project)
       } catch { router.replace('/projects') }
       finally { setLoading(false) }

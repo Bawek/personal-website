@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import axios from 'axios'
+import api from '@/lib/api'
 import Navbar from '@/components/Navbar/Navbar'
 import { HiArrowLeft, HiChip, HiAcademicCap, HiChartBar } from 'react-icons/hi'
 
@@ -39,7 +39,7 @@ export default function SkillDetail() {
     if (!slug) return
     const fetch = async () => {
       try {
-        const { data } = await axios.get(`/api/skills/${slug}`)
+        const { data } = await api.get(`/skills/${slug}`)
         setSkill(data.skill)
       } catch { router.replace('/skills') }
       finally { setLoading(false) }

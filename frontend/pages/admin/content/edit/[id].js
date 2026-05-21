@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import axios from 'axios'
+import api from '@/lib/api'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { HiXCircle, HiCheckCircle, HiArrowLeft } from 'react-icons/hi'
@@ -26,7 +26,7 @@ function EditContentForm() {
     if (!id) return
     const fetch = async () => {
       try {
-        const { data } = await axios.get(`/api/content/${id}`, { headers: headers() })
+        const { data } = await api.get(`/content/${id}`, { headers: headers() })
         const c = data
         setForm({
           title:        c.title        || '',
@@ -74,7 +74,7 @@ function EditContentForm() {
           keywords: form.seo.keywords ? form.seo.keywords.split(',').map(k => k.trim()).filter(Boolean) : []
         }
       }
-      await axios.put(`/api/content/${id}`, payload, { headers: headers() })
+      await api.put(`/content/${id}`, payload, { headers: headers() })
       setStatus('ok')
     } catch (err) {
       setErrMsg(err.response?.data?.message || 'Failed to save')

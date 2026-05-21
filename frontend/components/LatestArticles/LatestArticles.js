@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import axios from 'axios'
+import api from '@/lib/api'
 import { HiArrowRight, HiCalendar, HiClock } from 'react-icons/hi'
 
 function readingTime(text = '') {
@@ -16,7 +16,7 @@ export default function LatestArticles({ limit = 3 }) {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const { data } = await axios.get('/api/content', {
+        const { data } = await api.get('/content', {
           params: { type: 'post', status: 'published', limit, sortBy: 'publishedAt', sortOrder: 'desc' },
         })
         setPosts(data.contents || [])

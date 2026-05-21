@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
 import Link from 'next/link'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import {
   HiFolder, HiStar, HiLightningBolt, HiBriefcase, HiUsers,
@@ -48,10 +48,10 @@ function DashboardContent() {
       const token = localStorage.getItem('token')
       const headers = { Authorization: `Bearer ${token}` }
       const [pR, sR, eR, uR] = await Promise.allSettled([
-        axios.get('/api/projects',  { headers }),
-        axios.get('/api/skills',    { headers }),
-        axios.get('/api/experience',{ headers }),
-        axios.get('/api/users',     { headers }),
+        api.get('/projects',  { headers }),
+        api.get('/skills',    { headers }),
+        api.get('/experience',{ headers }),
+        api.get('/users',     { headers }),
       ])
       const projects    = pR.status === 'fulfilled' ? pR.value.data.projects    || [] : []
       const skills      = sR.status === 'fulfilled' ? sR.value.data.skills      || [] : []

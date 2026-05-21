@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { FaGithub, FaLinkedin } from 'react-icons/fa'
 import { HiCheckCircle, HiXCircle, HiRefresh } from 'react-icons/hi'
@@ -34,7 +34,7 @@ function SyncContent() {
     if (!gh.username) { setMsg({ type: 'err', text: 'Enter your GitHub username first' }); return }
     setLoading(true); setMsg(null)
     try {
-      const { data } = await axios.post('/api/sync/github/sync', { username: gh.username }, { headers: headers() })
+      const { data } = await api.post('/sync/github/sync', { username: gh.username }, { headers: headers() })
       setMsg({ type: 'ok', text: `Synced ${data.synced} repositories successfully!` })
     } catch (err) { setMsg({ type: 'err', text: err.response?.data?.error || 'Sync failed' }) }
     finally { setLoading(false) }
@@ -43,7 +43,7 @@ function SyncContent() {
   const saveSettings = async () => {
     setLoading(true); setMsg(null)
     try {
-      await axios.post('/api/sync/settings', { autoSyncGithub: gh.autoSync, autoPostLinkedin: li.autoPost, githubUsername: gh.username, linkedinEnabled: li.enabled }, { headers: headers() })
+      await api.post('/sync/settings', { autoSyncGithub: gh.autoSync, autoPostLinkedin: li.autoPost, githubUsername: gh.username, linkedinEnabled: li.enabled }, { headers: headers() })
       setMsg({ type: 'ok', text: 'Settings saved' })
     } catch { setMsg({ type: 'err', text: 'Failed to save settings' }) }
     finally { setLoading(false) }

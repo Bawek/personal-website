@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
-import axios from 'axios'
+import api from '@/lib/api'
 import Navbar from '@/components/Navbar/Navbar'
 import SeoHead from '@/components/SeoHead/SeoHead'
 import { HiArrowRight, HiTag, HiCalendar, HiEye, HiClock, HiSearch } from 'react-icons/hi'
@@ -73,7 +73,7 @@ export default function BlogIndex() {
   useEffect(() => {
     const fetch = async () => {
       try {
-        const { data } = await axios.get('/api/content', {
+        const { data } = await api.get('/content', {
           params: { type: 'post', status: 'published', limit: 50, sortBy: 'publishedAt', sortOrder: 'desc' },
         })
         setPosts(data.contents || [])

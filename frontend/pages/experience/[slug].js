@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import axios from 'axios'
+import api from '@/lib/api'
 import Navbar from '@/components/Navbar/Navbar'
 import { HiArrowLeft, HiLocationMarker, HiCalendar, HiExternalLink, HiBadgeCheck } from 'react-icons/hi'
 import { getEntryMeta } from '@/lib/timeline'
@@ -31,7 +31,7 @@ export default function ExperienceDetail() {
     if (!slug) return
     const fetch = async () => {
       try {
-        const { data } = await axios.get(`/api/experience/${slug}`)
+        const { data } = await api.get(`/experience/${slug}`)
         setExperience(data.experience)
       } catch {
         router.replace('/experience')

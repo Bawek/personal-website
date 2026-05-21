@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
@@ -24,7 +24,7 @@ function AboutContent() {
     const fetch = async () => {
       try {
         const token = localStorage.getItem('token')
-        const { data: res } = await axios.get('/api/about', { headers: { Authorization: `Bearer ${token}` } })
+        const { data: res } = await api.get('/about', { headers: { Authorization: `Bearer ${token}` } })
         if (res.about) setData(res.about)
       } catch {}
     }
@@ -37,7 +37,7 @@ function AboutContent() {
     e.preventDefault(); setLoading(true); setStatus(null)
     try {
       const token = localStorage.getItem('token')
-      await axios.put('/api/about', data, { headers: { Authorization: `Bearer ${token}` } })
+      await api.put('/about', data, { headers: { Authorization: `Bearer ${token}` } })
       setStatus('ok')
     } catch { setStatus('err') }
     finally { setLoading(false) }

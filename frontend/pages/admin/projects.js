@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
+import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiPencil, HiTrash, HiStar, HiPlus, HiX, HiExternalLink } from 'react-icons/hi'
 import { FaGithub } from 'react-icons/fa'
@@ -21,7 +21,7 @@ function ProjectsContent() {
   const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` })
 
   const fetchProjects = async () => {
-    try { const { data } = await axios.get('/api/projects', { headers: headers() }); setProjects(data.projects || []) }
+    try { const { data } = await api.get('/projects', { headers: headers() }); setProjects(data.projects || []) }
     catch { setError('Failed to load projects') }
     finally { setLoading(false) }
   }
@@ -46,8 +46,8 @@ function ProjectsContent() {
       } else {
         projectData.imageUrl = form.imageUrl; body = projectData
       }
-      if (editing) await axios.put(`/api/projects/${editing.slug}`, body, { headers: hdrs })
-      else         await axios.post('/api/projects', body, { headers: hdrs })
+      if (editing) await api.put(`/projects/${editing.slug}`, body, { headers: hdrs })
+      else         await api.post('/projects', body, { headers: hdrs })
       await fetchProjects(); closeForm()
     } catch (err) { setError(err.response?.data?.message || 'Failed to save') }
     finally { setSaving(false) }
@@ -55,12 +55,12 @@ function ProjectsContent() {
 
   const handleDelete = async (slug) => {
     if (!confirm('Delete this project?')) return
-    try { await axios.delete(`/api/projects/${slug}`, { headers: headers() }); await fetchProjects() }
+    try { await api.delete(`/projects/${slug}`, { headers: headers() }); await fetchProjects() }
     catch { setError('Failed to delete') }
   }
 
   const toggleFeatured = async (slug) => {
-    try { await axios.patch(`/api/projects/${slug}/toggle-featured`, {}, { headers: headers() }); await fetchProjects() }
+    try { await api.patch(`/projects/${slug}/toggle-featured`, {}, { headers: headers() }); await fetchProjects() }
     catch { setError('Failed to update') }
   }
 

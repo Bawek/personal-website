@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import axios from 'axios'
+import api from '@/lib/api'
 import Navbar from '@/components/Navbar/Navbar'
 import { HiArrowLeft, HiCalendar, HiEye, HiHeart, HiTag } from 'react-icons/hi'
 
@@ -19,10 +19,10 @@ export default function BlogPost() {
     if (!slug) return
     const fetch = async () => {
       try {
-        const { data } = await axios.get(`/api/content/${slug}`)
+        const { data } = await api.get(`/content/${slug}`)
         setPost(data)
         const tag = data.tags?.[0]
-        const { data: list } = await axios.get('/api/content', {
+        const { data: list } = await api.get('/content', {
           params: { type: 'post', status: 'published', limit: 4, tags: tag || undefined },
         })
         setRelated((list.contents || []).filter((p) => p.slug !== slug).slice(0, 3))
@@ -35,7 +35,7 @@ export default function BlogPost() {
   const handleLike = async () => {
     if (liked) return
     try {
-      await axios.post(`/api/content/${post._id}/like`)
+      await api.post(`/content/${post._id}/like`)
       setPost(prev => ({ ...prev, metadata: { ...prev.metadata, likes: (prev.metadata?.likes || 0) + 1 } }))
       setLiked(true)
     } catch {}
