@@ -11,7 +11,7 @@ const NAV = [
   { label: 'Dashboard',  href: '/admin/dashboard',  icon: HiViewGrid    },
   { label: 'Projects',   href: '/admin/projects',   icon: HiFolder      },
   { label: 'Skills',     href: '/admin/skills',     icon: HiLightningBolt },
-  { label: 'Experience', href: '/admin/experience', icon: HiBriefcase   },
+  { label: 'Timeline', href: '/admin/experience', icon: HiBriefcase   },
   { label: 'About',      href: '/admin/about',      icon: HiUser        },
   { label: 'Contact',    href: '/admin/contact',    icon: HiMail        },
   { label: 'Content',    href: '/admin/content',    icon: HiDocumentText },

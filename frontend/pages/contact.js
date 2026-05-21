@@ -59,7 +59,7 @@ export default function ContactPage() {
 
       <main>
         <Hero content={{ title: 'Contact', subtitle: 'Get in touch' }} />
-        <Contact content={contactData} />
+        <Contact content={contactData} settings={settings} />
       </main>
     </>
   )

@@ -83,6 +83,11 @@ const settingsSchema = new mongoose.Schema({
       }
     }
   },
+  widgets: {
+    currentlyBuilding: { type: String, default: '' },
+    currentlyReading: { type: String, default: '' },
+    siteLastUpdated: { type: Date }
+  },
   languages: {
     default: {
       type: String,

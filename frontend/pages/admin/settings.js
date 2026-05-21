@@ -23,7 +23,7 @@ const Toggle = ({ label, desc, checked, onChange }) => (
 )
 
 function SettingsContent() {
-  const [settings, setSettings] = useState({ siteName: '', siteDescription: '', contactInfo: { email: '', phone: '', address: '' }, seo: { metaTitle: '', metaDescription: '', keywords: [] }, theme: { primaryColor: '#8B5CF6', secondaryColor: '#EC4899', fontFamily: 'Inter' }, features: { blog: { enabled: true }, portfolio: { enabled: true }, contact: { enabled: true }, analytics: { enabled: false } } })
+  const [settings, setSettings] = useState({ siteName: '', siteDescription: '', contactInfo: { email: '', phone: '', address: '', responseTime: 'I typically respond within 48 hours.' }, widgets: { currentlyBuilding: '', currentlyReading: '', siteLastUpdated: '' }, seo: { metaTitle: '', metaDescription: '', keywords: [] }, theme: { primaryColor: '#8B5CF6', secondaryColor: '#EC4899', fontFamily: 'Inter' }, features: { blog: { enabled: true }, portfolio: { enabled: true }, contact: { enabled: true }, analytics: { enabled: false } } })
   const [loading, setLoading] = useState(false)
   const [status, setStatus]   = useState(null)
 
@@ -78,6 +78,17 @@ function SettingsContent() {
             <div><label className={LABEL_CLS}>Email</label><input type="email" value={settings.contactInfo?.email || ''} onChange={e => set('contactInfo.email', e.target.value)} placeholder="you@example.com" className={INPUT_CLS} /></div>
             <div><label className={LABEL_CLS}>Phone</label><input value={settings.contactInfo?.phone || ''} onChange={e => set('contactInfo.phone', e.target.value)} placeholder="+251…" className={INPUT_CLS} /></div>
             <div className="sm:col-span-2"><label className={LABEL_CLS}>Address</label><input value={settings.contactInfo?.address || ''} onChange={e => set('contactInfo.address', e.target.value)} placeholder="Addis Ababa, Ethiopia" className={INPUT_CLS} /></div>
+            <div className="sm:col-span-2"><label className={LABEL_CLS}>Response Time</label><input value={settings.contactInfo?.responseTime || ''} onChange={e => set('contactInfo.responseTime', e.target.value)} placeholder="I typically respond within 48 hours." className={INPUT_CLS} /></div>
+          </div>
+        </motion.div>
+
+        {/* Status widgets */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+          <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">Live Status Widgets</h2>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <div><label className={LABEL_CLS}>Currently Building</label><input value={settings.widgets?.currentlyBuilding || ''} onChange={e => set('widgets.currentlyBuilding', e.target.value)} placeholder="RAG chatbot for docs…" className={INPUT_CLS} /></div>
+            <div><label className={LABEL_CLS}>Currently Reading</label><input value={settings.widgets?.currentlyReading || ''} onChange={e => set('widgets.currentlyReading', e.target.value)} placeholder="Designing ML Systems…" className={INPUT_CLS} /></div>
           </div>
         </motion.div>
 

@@ -11,6 +11,7 @@ export default function BlogPost() {
   const router = useRouter()
   const { slug } = router.query
   const [post, setPost]       = useState(null)
+  const [related, setRelated] = useState([])
   const [loading, setLoading] = useState(true)
   const [liked, setLiked]     = useState(false)
 
@@ -20,6 +21,11 @@ export default function BlogPost() {
       try {
         const { data } = await axios.get(`/api/content/${slug}`)
         setPost(data)
+        const tag = data.tags?.[0]
+        const { data: list } = await axios.get('/api/content', {
+          params: { type: 'post', status: 'published', limit: 4, tags: tag || undefined },
+        })
+        setRelated((list.contents || []).filter((p) => p.slug !== slug).slice(0, 3))
       } catch { router.replace('/blog') }
       finally { setLoading(false) }
     }
@@ -119,6 +125,21 @@ export default function BlogPost() {
                        prose-strong:text-white prose-li:text-gray-300"
             dangerouslySetInnerHTML={{ __html: post.content }}
           />
+
+          {related.length > 0 && (
+            <aside className="mt-12 pt-8 border-t border-white/5">
+              <h2 className="text-lg font-bold text-white mb-4">Related Articles</h2>
+              <ul className="space-y-3">
+                {related.map((r) => (
+                  <li key={r._id}>
+                    <Link href={`/blog/${r.slug}`} className="text-violet-400 hover:text-violet-300 text-sm">
+                      {r.title}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </aside>
+          )}
 
           {/* Like button */}
           <div className="flex items-center justify-center mt-12 pt-8 border-t border-white/5">
