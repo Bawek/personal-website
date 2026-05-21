@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 const mongoose = require('mongoose');
-const User = require('./backend/models/User');
-const Settings = require('./backend/models/Settings');
+const User = require('./models/User');
+const Settings = require('./models/Settings');
 require('dotenv').config();
 
 async function setup() {

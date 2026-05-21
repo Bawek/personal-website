@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 
 const mongoose = require('mongoose');
-const Content = require('./backend/models/Content');
-const Settings = require('./backend/models/Settings');
-const User = require('./backend/models/User');
+const Content = require('./models/Content');
+const Settings = require('./models/Settings');
+const User = require('./models/User');
 require('dotenv').config();
 
 async function seed() {
