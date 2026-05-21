@@ -1,84 +1,105 @@
 const mongoose = require('mongoose');
 
 const experienceSchema = new mongoose.Schema({
+  entryType: {
+    type: String,
+    enum: ['work', 'education', 'certification', 'award', 'talk'],
+    default: 'work',
+  },
   title: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   slug: {
     type: String,
     required: true,
     unique: true,
-    lowercase: true
+    lowercase: true,
   },
   company: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
   },
   location: {
     type: String,
-    trim: true
+    trim: true,
   },
   employmentType: {
     type: String,
     enum: ['full-time', 'part-time', 'contract', 'internship', 'freelance'],
-    default: 'full-time'
+    default: 'full-time',
   },
   startDate: {
     type: Date,
-    required: true
+    required: true,
   },
   endDate: {
     type: Date,
-    default: null // null for current position
+    default: null,
   },
   current: {
     type: Boolean,
-    default: false
+    default: false,
   },
   description: {
     type: String,
-    required: true
+    required: true,
   },
   responsibilities: [{
     type: String,
-    trim: true
+    trim: true,
   }],
   achievements: [{
     type: String,
-    trim: true
+    trim: true,
   }],
   technologies: [{
     type: String,
-    trim: true
+    trim: true,
   }],
+  // Education
+  fieldOfStudy: { type: String, trim: true },
+  degree: { type: String, trim: true },
+  thesisTopic: { type: String, trim: true },
+  // Certification
+  credentialId: { type: String, trim: true },
+  credentialUrl: { type: String, trim: true },
+  // Talk / event
+  eventUrl: { type: String, trim: true },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
-    required: true
-  }
+    required: true,
+  },
 }, {
-  timestamps: true
+  timestamps: true,
 });
 
-// Create slug from title and company before saving
-experienceSchema.pre('save', function(next) {
-  if (this.isModified('title') || this.isModified('company')) {
-    if (!this.slug) {
-      this.slug = `${this.title} ${this.company}`
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
-    }
+function slugifyEntry(title, company) {
+  return `${title || ''} ${company || ''}`
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+experienceSchema.pre('validate', function(next) {
+  if (!this.slug && this.title) {
+    this.slug = slugifyEntry(this.title, this.company);
+  }
+  if (this.entryType !== 'work') {
+    this.current = false;
+  }
+  if (this.current) {
+    this.endDate = null;
   }
   next();
 });
 
-// Index for better query performance
 experienceSchema.index({ createdBy: 1, startDate: -1 });
-experienceSchema.index({ createdBy: 1, current: -1, startDate: -1 });
+experienceSchema.index({ createdBy: 1, entryType: 1, startDate: -1 });
 experienceSchema.index({ slug: 1 });
 
 module.exports = mongoose.model('Experience', experienceSchema);

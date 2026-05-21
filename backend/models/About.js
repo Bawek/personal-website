@@ -13,6 +13,13 @@ const aboutSchema = new mongoose.Schema({
     description: {
       type: String,
       default: ''
+    },
+    imageUrl: {
+      type: String,
+      default: ''
+    },
+    lastUpdated: {
+      type: Date
     }
   },
   whoAmI: {

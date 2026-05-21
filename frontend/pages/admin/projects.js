@@ -5,6 +5,7 @@ import { HiPencil, HiTrash, HiStar, HiPlus, HiX, HiExternalLink } from 'react-ic
 import { FaGithub } from 'react-icons/fa'
 import AdminLayout from '@/components/AdminLayout'
 import AuthProtection from '@/components/AuthProtection'
+import ImageUploadField from '@/components/Admin/ImageUploadField'
 
 const INIT = { title: '', description: '', techStack: '', liveUrl: '', githubUrl: '', imageUrl: '', imageFile: null, featured: false }
 
@@ -115,25 +116,15 @@ function ProjectsContent() {
                   className="admin-input" />
               </div>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Image URL</label>
-                <input type="url" value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value, imageFile: null })} placeholder="https://…/image.jpg"
-                  className="admin-input" />
-              </div>
-              <div>
-                <label className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Or Upload Image</label>
-                <label className="flex items-center gap-2 cursor-pointer w-full bg-white/5 border border-dashed border-white/20 rounded-xl px-4 py-2.5 text-sm text-gray-500 hover:border-violet-500/40 hover:text-gray-300 transition-all">
-                  <HiPlus size={14} />
-                  {form.imageFile ? form.imageFile.name : 'Choose file (max 5MB)'}
-                  <input type="file" accept="image/*" className="hidden" onChange={e => {
-                    const f = e.target.files[0]
-                    if (f && f.size <= 5*1024*1024) setForm({ ...form, imageFile: f, imageUrl: '' })
-                    else if (f) setError('Image must be under 5MB')
-                  }} />
-                </label>
-              </div>
-            </div>
+            <ImageUploadField
+              label="Project Image"
+              value={form.imageUrl}
+              file={form.imageFile}
+              folder="projects"
+              autoUpload
+              onError={setError}
+              onChange={({ url, file }) => setForm({ ...form, imageUrl: url, imageFile: file })}
+            />
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.featured} onChange={e => setForm({ ...form, featured: e.target.checked })}
                 className="w-4 h-4 rounded border-white/20 bg-white/5 text-violet-500 focus:ring-violet-500 focus:ring-offset-0" />

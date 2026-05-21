@@ -4,6 +4,7 @@ import { motion } from 'framer-motion'
 import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
 import AuthProtection from '@/components/AuthProtection'
+import ImageUploadField from '@/components/Admin/ImageUploadField'
 
 const FIELD = ({ label, children }) => (
   <div>
@@ -15,7 +16,7 @@ const FIELD = ({ label, children }) => (
 const INPUT_CLS = "admin-input"
 
 function AboutContent() {
-  const [data, setData]     = useState({ hero: { title: '', subtitle: '', description: '' }, whoAmI: { title: '', description: '' }, resume: { buttonText: '', fileUrl: '' } })
+  const [data, setData]     = useState({ hero: { title: '', subtitle: '', description: '', imageUrl: '' }, whoAmI: { title: '', description: '' }, resume: { buttonText: '', fileUrl: '' } })
   const [loading, setLoading] = useState(false)
   const [status, setStatus]   = useState(null) // 'ok' | 'err'
 
@@ -65,6 +66,13 @@ function AboutContent() {
           <FIELD label="Description">
             <textarea rows={3} value={data.hero.description} onChange={e => set('hero','description',e.target.value)} placeholder="Short intro shown in the hero…" className={`${INPUT_CLS} resize-none`} />
           </FIELD>
+          <ImageUploadField
+            label="Profile Photo"
+            value={data.hero.imageUrl || ''}
+            folder="about"
+            onError={() => setStatus('err')}
+            onChange={({ url }) => set('hero', 'imageUrl', url)}
+          />
         </motion.div>
 
         {/* Who I Am */}

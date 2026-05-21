@@ -77,7 +77,12 @@ router.get('/messages', authenticate, async (req, res) => {
 // POST /api/contact/messages - Create a new message (public endpoint)
 router.post('/messages', async (req, res) => {
   try {
-    const { name, email, message } = req.body;
+    const { name, email, subject, message, website } = req.body;
+
+    // Honeypot — bots often fill hidden fields
+    if (website) {
+      return res.status(201).json({ success: true, message: 'Message sent successfully' });
+    }
     
     if (!name || !email || !message) {
       return res.status(400).json({
@@ -89,6 +94,7 @@ router.post('/messages', async (req, res) => {
     const newMessage = new Message({
       name,
       email,
+      subject: subject || '',
       message
     });
     

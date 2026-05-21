@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { HiXCircle, HiCheckCircle, HiArrowLeft } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
 import AuthProtection from '@/components/AuthProtection'
+import ImageUploadField from '@/components/Admin/ImageUploadField'
 
 const LABEL = "block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2"
 
@@ -153,10 +154,14 @@ function EditContentForm() {
                 <option value="zh">Chinese</option>
               </select>
             </div>
-            <div>
-              <label htmlFor="featuredImage" className={LABEL}>Featured Image URL</label>
-              <input id="featuredImage" name="featuredImage" type="url" value={form.featuredImage} onChange={handleChange}
-                placeholder="https://…/image.jpg" className="admin-input" />
+            <div className="sm:col-span-2">
+              <ImageUploadField
+                label="Featured Image"
+                value={form.featuredImage}
+                folder="content"
+                onError={setErrMsg}
+                onChange={({ url }) => set('featuredImage', url)}
+              />
             </div>
           </div>
         </motion.div>
