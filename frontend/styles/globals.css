@@ -6,11 +6,13 @@
 
 @layer base {
   :root {
-    --color-primary: 139 92 246;   /* violet-500 */
-    --color-accent:  236 72 153;   /* pink-500   */
-    --color-bg:      15 15 23;     /* near-black  */
-    --color-surface: 22 22 34;     /* card bg     */
-    --color-border:  255 255 255;  /* white/10    */
+    --color-primary: 139 92 246;
+    --color-accent:  236 72 153;
+    --color-bg:      15 15 23;
+    --color-surface: 22 22 34;
+    --color-text:    243 244 246;
+    --color-muted:   156 163 175;
+    --color-border:  255 255 255;
   }
 
   html {
@@ -20,6 +22,53 @@
   body {
     @apply bg-[#0f0f17] text-gray-100 font-sans antialiased;
     font-family: 'Inter', sans-serif;
+    background-color: rgb(var(--color-bg));
+    color: rgb(var(--color-text));
+  }
+
+  [data-theme="light"] {
+    --color-bg: 248 250 252;
+    --color-surface: 255 255 255;
+    --color-text: 15 23 42;
+    --color-muted: 100 116 139;
+    --color-border: 226 232 240;
+  }
+
+  [data-theme="light"] body {
+    @apply text-slate-900;
+  }
+
+  [data-theme="light"] .glass-card {
+    @apply bg-white border-slate-200 shadow-sm;
+  }
+
+  [data-theme="light"] h1,
+  [data-theme="light"] h2,
+  [data-theme="light"] .text-gray-100 {
+    @apply text-slate-900;
+  }
+
+  [data-theme="light"] .text-gray-300,
+  [data-theme="light"] .text-gray-400 {
+    @apply text-slate-600;
+  }
+
+  [data-theme="light"] .btn-ghost {
+    @apply border-slate-300 !text-slate-700 hover:!text-slate-900;
+  }
+
+  [data-theme="light"] header.bg-bg\/80 {
+    background-color: rgba(248, 250, 252, 0.9);
+    border-color: rgb(226 232 240);
+  }
+
+  [data-font-scale="large"] html {
+    font-size: 112.5%;
+  }
+
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[100]
+           focus:px-4 focus:py-2 focus:rounded-lg focus:bg-violet-600 focus:text-white focus:font-medium;
   }
 
   h1, h2, h3, h4, h5, h6 {

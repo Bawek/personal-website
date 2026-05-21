@@ -58,8 +58,8 @@ export default function ExperiencePage() {
       <Navbar />
 
       <main>
-        <Hero content={{ title: 'Experience', subtitle: 'My professional journey' }} />
-        <Experience experience={experience} />
+        <Hero content={{ title: 'Experience & Education', subtitle: 'Career, academics, and credentials' }} />
+        <Experience experience={experience} showFilters />
       </main>
     </>
   )

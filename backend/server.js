@@ -16,6 +16,7 @@ const experienceRoutes = require('./routes/experience');
 const aboutRoutes = require('./routes/about');
 const contactRoutes = require('./routes/contact');
 const syncRoutes = require('./routes/sync');
+const uploadRoutes = require('./routes/uploads');
 
 const app = express();
 
@@ -72,6 +73,7 @@ app.use('/api/experience', experienceRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/sync', syncRoutes);
+app.use('/api/uploads', uploadRoutes);
 
 // Serve static files from uploads folder
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
