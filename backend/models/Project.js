@@ -45,13 +45,18 @@ const projectSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Create slug from title before saving
-projectSchema.pre('save', function(next) {
-  if (this.isModified('title') && !this.slug) {
-    this.slug = this.title
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+function slugifyTitle(title) {
+  return title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+// Generate slug before validation (required field must exist when validators run)
+projectSchema.pre('validate', function(next) {
+  if (this.title && !this.slug) {
+    this.slug = slugifyTitle(this.title);
   }
   next();
 });

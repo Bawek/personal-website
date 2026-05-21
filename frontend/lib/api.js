@@ -95,6 +95,17 @@ export const aboutAPI = {
   update: (aboutData) => api.put('/about', aboutData),
 };
 
+// Uploads API
+export const uploadsAPI = {
+  uploadImage: (file, folder = 'general') => {
+    const formData = new FormData();
+    formData.append('image', file);
+    return api.post(`/uploads?folder=${encodeURIComponent(folder)}`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+  },
+};
+
 // Contact API
 export const contactAPI = {
   get: () => api.get('/contact'),

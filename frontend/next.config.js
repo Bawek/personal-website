@@ -14,6 +14,13 @@ const nextConfig = {
       'lh3.googleusercontent.com',       // Google profile pictures
     ],
   },
+  async redirects() {
+    return [
+      { source: '/expenso', destination: '/projects', permanent: true },
+      { source: '/mingo', destination: '/projects', permanent: true },
+      { source: '/mailbox-client', destination: '/projects', permanent: true },
+    ];
+  },
   async rewrites() {
     // In development, proxy /api/* and /uploads/* to the Express backend.
     // In production (Firebase hosting), these are handled by firebase.json rewrites
