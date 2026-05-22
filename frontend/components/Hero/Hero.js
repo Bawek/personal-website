@@ -29,6 +29,7 @@ function formatLastUpdated(date) {
 }
 
 export default function Hero({ content, lastUpdated, statusWidgets }) {
+  console.log('Hero content:', content)
   const subtitle = content?.subtitle || 'AI Engineer building production-ready machine learning systems'
   const rawTitle = content?.title || ''
   const nameMatch = rawTitle.match(/(?:Hello,?\s+I(?:'m| am)\s+)(.+)/i)
