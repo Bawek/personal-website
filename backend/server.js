@@ -34,7 +34,9 @@ if (!process.env.MONGODB_URI) {
 app.set('trust proxy', 1);
 
 // Security middleware
-app.use(helmet());
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: 'cross-origin' },
+}));
 console.log('NODE_ENV:', process.env.NODE_ENV)
 console.log('FRONTEND_URL:', process.env.FRONTEND_URL)
 const allowedOrigins = [process.env.FRONTEND_URL, process.env.BASE_URL].filter(Boolean);
