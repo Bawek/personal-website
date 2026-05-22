@@ -89,7 +89,7 @@ router.post('/', authenticate, upload.single('image'), async (req, res) => {
     
     if (req.file) {
       // Handle file upload
-      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
       const imageUrl = `${baseUrl}/uploads/projects/${req.file.filename}`;
       projectData = {
         ...JSON.parse(req.body.data),
@@ -148,7 +148,7 @@ router.put('/:slug', authenticate, upload.single('image'), async (req, res) => {
     
     if (req.file) {
       // Handle file upload
-      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+      const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
       const imageUrl = `${baseUrl}/uploads/projects/${req.file.filename}`;
       updateData = {
         ...JSON.parse(req.body.data),

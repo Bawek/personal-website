@@ -37,11 +37,17 @@ app.set('trust proxy', 1);
 app.use(helmet());
 console.log('NODE_ENV:', process.env.NODE_ENV)
 console.log('FRONTEND_URL:', process.env.FRONTEND_URL)
+const allowedOrigins = [process.env.FRONTEND_URL, process.env.BASE_URL].filter(Boolean);
+
 app.use(cors({
   origin: process.env.NODE_ENV === 'production'
-    ? (process.env.FRONTEND_URL ? [process.env.FRONTEND_URL] : [])
+    ? ((origin, callback) => {
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        callback(new Error(`CORS origin denied: ${origin}`));
+      })
     : ['http://localhost:3000'],
-  credentials: true
+  credentials: true,
 }));
 
 // Rate limiting
