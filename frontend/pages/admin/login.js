@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
 import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiLockClosed, HiMail, HiEye, HiEyeOff } from 'react-icons/hi'
@@ -113,10 +112,7 @@ function LoginForm() {
           </form>
 
           <p className="text-center text-sm text-gray-600 mt-6">
-            No account?{' '}
-            <Link href="/admin/register" className="text-violet-400 hover:text-violet-300 transition-colors">
-              Register here
-            </Link>
+            Registration is restricted to admin users.
           </p>
         </div>
       </motion.div>

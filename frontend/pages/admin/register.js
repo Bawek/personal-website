@@ -4,6 +4,7 @@ import Link from 'next/link'
 import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import { HiLockClosed, HiMail, HiUser, HiShieldCheck } from 'react-icons/hi'
+import AuthProtection from '@/components/AuthProtection'
 
 const ROLES = [
   { value: 'admin',  label: 'Admin',  desc: 'Full access to all features and user management' },
@@ -37,15 +38,16 @@ export default function AdminRegister() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0f0f17] flex items-center justify-center p-4">
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-violet-600/8 blur-[100px] pointer-events-none" />
+    <AuthProtection requireAuth={true} allowedRoles={['admin']}>
+      <div className="min-h-screen bg-[#0f0f17] flex items-center justify-center p-4">
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-violet-600/8 blur-[100px] pointer-events-none" />
 
-      <motion.div
-        initial={{ opacity: 0, y: 24 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md relative z-10"
-      >
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="w-full max-w-md relative z-10"
+        >
         <div className="text-center mb-8">
           <span className="font-mono font-bold text-2xl text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-pink-500">
             baweke<span className="text-violet-400">.</span>admin
@@ -139,5 +141,6 @@ export default function AdminRegister() {
         </div>
       </motion.div>
     </div>
+    </AuthProtection>
   )
 }

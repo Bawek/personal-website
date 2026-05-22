@@ -1,22 +1,35 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 
-export default function AuthProtection({ children, requireAuth = true }) {
+export default function AuthProtection({ children, requireAuth = true, allowedRoles = [] }) {
   const router = useRouter()
   const [ready, setReady] = useState(false)
   const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
     const token = localStorage.getItem('token')
-    const user  = localStorage.getItem('user')
-    const ok    = !!(token && user)
+    const userText = localStorage.getItem('user')
+    const user = userText ? JSON.parse(userText) : null
+    const ok = !!(token && user)
     setAuthed(ok)
 
-    if (requireAuth && !ok) { router.replace('/admin/login');     return }
-    if (!requireAuth && ok) { router.replace('/admin/dashboard'); return }
+    if (requireAuth && !ok) {
+      router.replace('/admin/login')
+      return
+    }
+
+    if (allowedRoles.length && user && !allowedRoles.includes(user.role)) {
+      router.replace('/admin/dashboard')
+      return
+    }
+
+    if (!requireAuth && ok) {
+      router.replace('/admin/dashboard')
+      return
+    }
 
     setReady(true)
-  }, [router, requireAuth])
+  }, [router, requireAuth, allowedRoles])
 
   if (!ready) {
     return (

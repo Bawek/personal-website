@@ -26,25 +26,6 @@ router.post('/register', [
 
     const { username, email, password } = req.body;
 
-    // Role assignment: only an authenticated admin can create admin/editor accounts.
-    // Anyone registering without a valid admin token gets 'viewer'.
-    let role = 'viewer';
-    const authHeader = req.header('Authorization');
-    if (authHeader && req.body.role && req.body.role !== 'viewer') {
-      try {
-        const decoded = require('jsonwebtoken').verify(
-          authHeader.replace('Bearer ', ''),
-          process.env.JWT_SECRET
-        );
-        const requestingUser = await User.findById(decoded.userId);
-        if (requestingUser && requestingUser.role === 'admin') {
-          role = req.body.role;
-        }
-      } catch {
-        // Invalid token — fall back to viewer
-      }
-    }
-
     // Check if user already exists
     const existingUser = await User.findOne({
       $or: [{ email }, { username }]
@@ -56,10 +37,34 @@ router.post('/register', [
       });
     }
 
-    // Allow first-ever user to be admin (bootstrapping)
     const userCount = await User.countDocuments();
+    let role = 'viewer';
+
     if (userCount === 0) {
+      // First user may bootstrap as admin
       role = 'admin';
+    } else {
+      // Only an authenticated admin may create new accounts
+      const authHeader = req.header('Authorization');
+      if (!authHeader) {
+        return res.status(401).json({ message: 'Registration is restricted to admin users.' });
+      }
+
+      try {
+        const decoded = require('jsonwebtoken').verify(
+          authHeader.replace('Bearer ', ''),
+          process.env.JWT_SECRET
+        );
+        const requestingUser = await User.findById(decoded.userId);
+
+        if (!requestingUser || requestingUser.role !== 'admin') {
+          return res.status(403).json({ message: 'Only admins can register new users.' });
+        }
+
+        role = req.body.role || 'viewer';
+      } catch {
+        return res.status(401).json({ message: 'Invalid authorization token.' });
+      }
     }
 
     // Create new user
