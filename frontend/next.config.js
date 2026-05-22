@@ -12,6 +12,8 @@ const nextConfig = {
       'res.cloudinary.com',              // Cloudinary (if used for uploads)
       'images.unsplash.com',             // Unsplash
       'lh3.googleusercontent.com',       // Google profile pictures
+      'personal-website-lrjc.onrender.com' // ✅ ADD THIS
+
     ],
   },
   async redirects() {
