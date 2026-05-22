@@ -89,7 +89,8 @@ router.post('/', authenticate, upload.single('image'), async (req, res) => {
     
     if (req.file) {
       // Handle file upload
-      const imageUrl = `/uploads/projects/${req.file.filename}`;
+      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+      const imageUrl = `${baseUrl}/uploads/projects/${req.file.filename}`;
       projectData = {
         ...JSON.parse(req.body.data),
         imageUrl: imageUrl,
@@ -147,19 +148,24 @@ router.put('/:slug', authenticate, upload.single('image'), async (req, res) => {
     
     if (req.file) {
       // Handle file upload
-      const imageUrl = `/uploads/projects/${req.file.filename}`;
+      const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+      const imageUrl = `${baseUrl}/uploads/projects/${req.file.filename}`;
       updateData = {
         ...JSON.parse(req.body.data),
         imageUrl: imageUrl
       };
       
       // Delete old image file if it exists
-      if (project.imageUrl && project.imageUrl.startsWith('/uploads/')) {
-        const oldImagePath = path.join(__dirname, '..', project.imageUrl);
-        if (fs.existsSync(oldImagePath)) {
-          fs.unlink(oldImagePath, (err) => {
-            if (err) console.error('Error deleting old image:', err);
-          });
+      if (project.imageUrl && project.imageUrl.includes('/uploads/')) {
+        const match = project.imageUrl.match(/\/uploads\/.+/);
+        if (match) {
+          const relativePath = match[0];
+          const oldImagePath = path.join(__dirname, '..', relativePath);
+          if (fs.existsSync(oldImagePath)) {
+            fs.unlink(oldImagePath, (err) => {
+              if (err) console.error('Error deleting old image:', err);
+            });
+          }
         }
       }
     } else {
@@ -240,12 +246,16 @@ router.delete('/:slug', authenticate, async (req, res) => {
     }
     
     // Delete associated image file if it exists
-    if (project.imageUrl && project.imageUrl.startsWith('/uploads/')) {
-      const imagePath = path.join(__dirname, '..', project.imageUrl);
-      if (fs.existsSync(imagePath)) {
-        fs.unlink(imagePath, (err) => {
-          if (err) console.error('Error deleting image file:', err);
-        });
+    if (project.imageUrl && project.imageUrl.includes('/uploads/')) {
+      const match = project.imageUrl.match(/\/uploads\/.+/);
+      if (match) {
+        const relativePath = match[0];
+        const imagePath = path.join(__dirname, '..', relativePath);
+        if (fs.existsSync(imagePath)) {
+          fs.unlink(imagePath, (err) => {
+            if (err) console.error('Error deleting image file:', err);
+          });
+        }
       }
     }
     

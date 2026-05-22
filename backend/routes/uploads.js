@@ -39,9 +39,11 @@ router.post('/', authenticate, upload.single('image'), (req, res) => {
       return res.status(400).json({ success: false, message: 'No image provided' });
     }
     const folder = req.uploadFolder || 'general';
+    const baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+    const fullUrl = `${baseUrl}/uploads/${folder}/${req.file.filename}`;
     res.status(201).json({
       success: true,
-      url: `/uploads/${folder}/${req.file.filename}`,
+      url: fullUrl,
     });
   } catch (error) {
     console.error('Upload error:', error);
