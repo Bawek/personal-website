@@ -105,4 +105,23 @@ export const contactAPI = {
   deleteMessage: (id) => api.delete(`/contact/messages/${id}`),
 };
 
+// Education API
+export const educationAPI = {
+  getAll: () => api.get('/education'),
+  getBySlug: (slug) => api.get(`/education/slug/${slug}`),
+  create: (educationData) => api.post('/education', educationData),
+  update: (id, educationData) => api.put(`/education/${id}`, educationData),
+  delete: (id) => api.delete(`/education/${id}`),
+};
+
+// Certifications API
+export const certificationsAPI = {
+  getAll: () => api.get('/certifications'),
+  getFeatured: () => api.get('/certifications/featured'),
+  getBySlug: (slug) => api.get(`/certifications/slug/${slug}`),
+  create: (certificationData) => api.post('/certifications', certificationData),
+  update: (id, certificationData) => api.put(`/certifications/${id}`, certificationData),
+  delete: (id) => api.delete(`/certifications/${id}`),
+};
+
 export default api;

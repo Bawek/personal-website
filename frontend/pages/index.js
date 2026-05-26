@@ -4,11 +4,15 @@ import Navbar from '@/components/Navbar/Navbar'
 import Hero from '@/components/Hero/Hero'
 import About from '@/components/About/About'
 import Experience from '@/components/Experience/Experience'
+import Education from '@/components/Education/Education'
 import Skills from '@/components/Skills/Skills'
 import Projects from '@/components/Projects/Projects'
+import Certifications from '@/components/Certifications/Certifications'
 import Contact from '@/components/Contact/Contact'
 import AdminLoginButton from '@/components/AdminLoginButton'
-import { projectsAPI, skillsAPI, experienceAPI, aboutAPI, contactAPI, settingsAPI } from '@/lib/api'
+import BackToTop from '@/components/BackToTop'
+import StatusWidgets from '@/components/StatusWidgets'
+import { projectsAPI, skillsAPI, experienceAPI, aboutAPI, contactAPI, settingsAPI, educationAPI, certificationsAPI } from '@/lib/api'
 
 export default function Home() {
   const [settings, setSettings]   = useState(null)
@@ -17,12 +21,14 @@ export default function Home() {
   const [skills, setSkills]       = useState([])
   const [projects, setProjects]   = useState([])
   const [experience, setExperience] = useState([])
+  const [education, setEducation] = useState([])
+  const [certifications, setCertifications] = useState([])
   const [loading, setLoading]     = useState(true)
 
   useEffect(() => {
     const fetchAll = async () => {
       try {
-        const [settingsRes, aboutRes, contactRes, skillsRes, projectsRes, experienceRes] =
+        const [settingsRes, aboutRes, contactRes, skillsRes, projectsRes, experienceRes, educationRes, certificationsRes] =
           await Promise.allSettled([
             settingsAPI.get(),
             aboutAPI.get(),
@@ -30,6 +36,8 @@ export default function Home() {
             skillsAPI.getAll(),
             projectsAPI.getAll(),
             experienceAPI.getAll(),
+            educationAPI.getAll(),
+            certificationsAPI.getAll(),
           ])
 
         if (settingsRes.status   === 'fulfilled') setSettings(settingsRes.value.data.settings)
@@ -38,6 +46,8 @@ export default function Home() {
         if (skillsRes.status     === 'fulfilled') setSkills(skillsRes.value.data.skills || [])
         if (projectsRes.status   === 'fulfilled') setProjects(projectsRes.value.data.projects || [])
         if (experienceRes.status === 'fulfilled') setExperience(experienceRes.value.data.experiences || [])
+        if (educationRes.status  === 'fulfilled') setEducation(educationRes.value.data.education || [])
+        if (certificationsRes.status === 'fulfilled') setCertifications(certificationsRes.value.data.certifications || [])
       } catch (err) {
         console.error('Error fetching content:', err)
       } finally {
@@ -79,12 +89,16 @@ export default function Home() {
         <Hero content={aboutData?.hero} />
         <About content={aboutData} experience={experience} />
         <Experience experience={experience} />
+        <Education education={education} />
         <Skills skills={skills} />
         <Projects projects={projects} />
+        <Certifications certifications={certifications} />
         <Contact content={contactData} />
       </main>
 
       <AdminLoginButton />
+      <BackToTop />
+      <StatusWidgets statusWidgets={settings?.statusWidgets} />
     </>
   )
 }

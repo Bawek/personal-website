@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { HiDownload } from 'react-icons/hi'
+import { HiDownload, HiLightBulb, HiHeart, HiStar } from 'react-icons/hi'
 
 const fadeUp = (delay = 0) => ({
   hidden: { opacity: 0, y: 30 },
@@ -42,15 +42,80 @@ export default function About({ content, experience }) {
             initial="hidden"
             whileInView="show"
             viewport={{ once: true }}
-            className="lg:col-span-3 space-y-5"
+            className="lg:col-span-3 space-y-8"
           >
+            {/* Who I Am */}
             <p className="text-gray-300 leading-relaxed text-base">
               {content?.whoAmI?.description ||
                 "I'm a Software Engineer passionate about building clean, performant web applications. I've worked on real-world end-to-end projects using React, Next.js, Node.js, and MongoDB — always with an eye for good UX and maintainable code."}
             </p>
-            <p className="text-gray-400 leading-relaxed text-base">
-              I&apos;m a quick learner with a strong problem-solving mindset. I love exploring new technologies and continuously levelling up my skills.
-            </p>
+
+            {/* AI/ML Philosophy */}
+            {(content?.philosophy?.description || content?.philosophy?.aiMLApproach) && (
+              <div className="glass-card p-6 space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <HiLightBulb className="text-violet-400" size={20} />
+                  <h3 className="text-white font-semibold">{content?.philosophy?.title || 'My Philosophy'}</h3>
+                </div>
+                {content?.philosophy?.description && (
+                  <p className="text-gray-300 text-sm leading-relaxed">
+                    {content.philosophy.description}
+                  </p>
+                )}
+                {content?.philosophy?.aiMLApproach && (
+                  <div className="border-t border-white/10 pt-4">
+                    <p className="text-xs font-mono text-violet-400 uppercase tracking-widest mb-2">AI/ML Approach</p>
+                    <p className="text-gray-400 text-sm leading-relaxed">
+                      {content.philosophy.aiMLApproach}
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Personal Interests */}
+            {content?.interests?.items?.length > 0 && (
+              <div className="glass-card p-6 space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <HiHeart className="text-pink-400" size={20} />
+                  <h3 className="text-white font-semibold">{content?.interests?.title || 'Personal Interests'}</h3>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {content.interests.items.map((interest, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      {interest.icon && (
+                        <span className="text-2xl" aria-hidden="true">{interest.icon}</span>
+                      )}
+                      <div>
+                        <p className="text-white font-medium text-sm">{interest.name}</p>
+                        <p className="text-gray-400 text-xs mt-1">{interest.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Professional Values */}
+            {content?.values?.items?.length > 0 && (
+              <div className="glass-card p-6 space-y-4">
+                <div className="flex items-center gap-3 mb-4">
+                  <HiStar className="text-amber-400" size={20} />
+                  <h3 className="text-white font-semibold">{content?.values?.title || 'Professional Values'}</h3>
+                </div>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  {content.values.items.map((value, index) => (
+                    <div key={index} className="flex items-start gap-3">
+                      <span className="text-violet-400 mt-1 flex-shrink-0" aria-hidden="true">▸</span>
+                      <div>
+                        <p className="text-white font-medium text-sm">{value.name}</p>
+                        <p className="text-gray-400 text-xs mt-1">{value.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Current roles */}
             {currentJobs.length > 0 && (

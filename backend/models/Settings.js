@@ -93,6 +93,34 @@ const settingsSchema = new mongoose.Schema({
       name: String,
       flag: String
     }]
+  },
+  // Status widgets for PRD compliance
+  statusWidgets: {
+    currentlyReading: {
+      enabled: {
+        type: Boolean,
+        default: false
+      },
+      bookTitle: String,
+      author: String,
+      coverUrl: String,
+      link: String
+    },
+    currentlyBuilding: {
+      enabled: {
+        type: Boolean,
+        default: false
+      },
+      projectName: String,
+      description: String,
+      technologies: [String],
+      progress: {
+        type: Number,
+        default: 0,
+        min: 0,
+        max: 100
+      }
+    }
   }
 }, {
   timestamps: true

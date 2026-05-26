@@ -5,18 +5,21 @@ import {
   HiViewGrid, HiFolder, HiLightningBolt, HiBriefcase,
   HiUser, HiMail, HiCog, HiRefresh, HiDocumentText,
   HiLogout, HiMenuAlt2, HiX, HiChevronRight, HiExternalLink,
+  HiAcademicCap, HiBadgeCheck,
 } from 'react-icons/hi'
 
 const NAV = [
-  { label: 'Dashboard',  href: '/admin/dashboard',  icon: HiViewGrid    },
-  { label: 'Projects',   href: '/admin/projects',   icon: HiFolder      },
-  { label: 'Skills',     href: '/admin/skills',     icon: HiLightningBolt },
-  { label: 'Experience', href: '/admin/experience', icon: HiBriefcase   },
-  { label: 'About',      href: '/admin/about',      icon: HiUser        },
-  { label: 'Contact',    href: '/admin/contact',    icon: HiMail        },
-  { label: 'Content',    href: '/admin/content',    icon: HiDocumentText },
-  { label: 'Sync',       href: '/admin/sync',       icon: HiRefresh     },
-  { label: 'Settings',   href: '/admin/settings',   icon: HiCog         },
+  { label: 'Dashboard',      href: '/admin/dashboard',       icon: HiViewGrid      },
+  { label: 'Projects',       href: '/admin/projects',        icon: HiFolder        },
+  { label: 'Skills',         href: '/admin/skills',          icon: HiLightningBolt },
+  { label: 'Experience',    href: '/admin/experience',     icon: HiBriefcase     },
+  { label: 'Education',      href: '/admin/education',      icon: HiAcademicCap   },
+  { label: 'Certifications', href: '/admin/certifications', icon: HiBadgeCheck    },
+  { label: 'About',          href: '/admin/about',           icon: HiUser          },
+  { label: 'Contact',        href: '/admin/contact',         icon: HiMail          },
+  { label: 'Content',        href: '/admin/content',         icon: HiDocumentText  },
+  { label: 'Sync',           href: '/admin/sync',            icon: HiRefresh       },
+  { label: 'Settings',       href: '/admin/settings',        icon: HiCog           },
 ]
 
 export default function AdminLayout({ children, title }) {

@@ -16,6 +16,37 @@ const projectSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  // Case study fields for PRD compliance
+  problemStatement: {
+    type: String,
+    trim: true
+  },
+  role: {
+    type: String,
+    trim: true
+  },
+  responsibilities: [{
+    type: String,
+    trim: true
+  }],
+  approach: {
+    type: String,
+    trim: true
+  },
+  methodologies: [{
+    type: String,
+    trim: true
+  }],
+  outcomes: {
+    type: String,
+    trim: true
+  },
+  metrics: [{
+    label: String,
+    value: String,
+    improvement: String
+  }],
+  // Original fields
   techStack: {
     type: [String],
     required: true
@@ -36,6 +67,15 @@ const projectSchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  category: {
+    type: String,
+    enum: ['personal', 'professional', 'open-source', 'research', 'freelance'],
+    default: 'personal'
+  },
+  domain: [{
+    type: String,
+    trim: true
+  }],
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -60,5 +100,6 @@ projectSchema.pre('save', function(next) {
 projectSchema.index({ featured: -1, createdAt: -1 });
 projectSchema.index({ createdBy: 1 });
 projectSchema.index({ slug: 1 });
+projectSchema.index({ category: 1 });
 
 module.exports = mongoose.model('Project', projectSchema);

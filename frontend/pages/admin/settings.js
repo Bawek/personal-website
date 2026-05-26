@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import { motion } from 'framer-motion'
-import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
+import { HiCheckCircle, HiXCircle, HiBookOpen, HiCode } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
 import AuthProtection from '@/components/AuthProtection'
 
@@ -23,7 +23,18 @@ const Toggle = ({ label, desc, checked, onChange }) => (
 )
 
 function SettingsContent() {
-  const [settings, setSettings] = useState({ siteName: '', siteDescription: '', contactInfo: { email: '', phone: '', address: '' }, seo: { metaTitle: '', metaDescription: '', keywords: [] }, theme: { primaryColor: '#8B5CF6', secondaryColor: '#EC4899', fontFamily: 'Inter' }, features: { blog: { enabled: true }, portfolio: { enabled: true }, contact: { enabled: true }, analytics: { enabled: false } } })
+  const [settings, setSettings] = useState({ 
+    siteName: '', 
+    siteDescription: '', 
+    contactInfo: { email: '', phone: '', address: '' }, 
+    seo: { metaTitle: '', metaDescription: '', keywords: [] }, 
+    theme: { primaryColor: '#8B5CF6', secondaryColor: '#EC4899', fontFamily: 'Inter' }, 
+    features: { blog: { enabled: true }, portfolio: { enabled: true }, contact: { enabled: true }, analytics: { enabled: false } },
+    statusWidgets: {
+      currentlyReading: { enabled: false, bookTitle: '', author: '', coverUrl: '', link: '' },
+      currentlyBuilding: { enabled: false, projectName: '', description: '', technologies: '', progress: 0 }
+    }
+  })
   const [loading, setLoading] = useState(false)
   const [status, setStatus]   = useState(null)
 
@@ -81,6 +92,72 @@ function SettingsContent() {
           </div>
         </motion.div>
 
+        {/* Status Widgets */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.08 }}
+          className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
+          <h2 className="text-sm font-mono text-gray-400 uppercase tracking-widest">Status Widgets</h2>
+          
+          {/* Currently Reading */}
+          <div className="space-y-3 pt-3 border-t border-white/10">
+            <Toggle 
+              label="Currently Reading" 
+              desc="Show what you're currently reading on the homepage" 
+              checked={settings.statusWidgets?.currentlyReading?.enabled ?? false} 
+              onChange={e => set('statusWidgets.currentlyReading.enabled', e.target.checked)} 
+            />
+            {settings.statusWidgets?.currentlyReading?.enabled && (
+              <div className="grid sm:grid-cols-2 gap-4 pl-4">
+                <div>
+                  <label className={LABEL_CLS}>Book Title</label>
+                  <input value={settings.statusWidgets?.currentlyReading?.bookTitle || ''} onChange={e => set('statusWidgets.currentlyReading.bookTitle', e.target.value)} placeholder="Book name" className={INPUT_CLS} />
+                </div>
+                <div>
+                  <label className={LABEL_CLS}>Author</label>
+                  <input value={settings.statusWidgets?.currentlyReading?.author || ''} onChange={e => set('statusWidgets.currentlyReading.author', e.target.value)} placeholder="Author name" className={INPUT_CLS} />
+                </div>
+                <div>
+                  <label className={LABEL_CLS}>Cover URL</label>
+                  <input type="url" value={settings.statusWidgets?.currentlyReading?.coverUrl || ''} onChange={e => set('statusWidgets.currentlyReading.coverUrl', e.target.value)} placeholder="https://..." className={INPUT_CLS} />
+                </div>
+                <div>
+                  <label className={LABEL_CLS}>Link URL</label>
+                  <input type="url" value={settings.statusWidgets?.currentlyReading?.link || ''} onChange={e => set('statusWidgets.currentlyReading.link', e.target.value)} placeholder="https://..." className={INPUT_CLS} />
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Currently Building */}
+          <div className="space-y-3 pt-3 border-t border-white/10">
+            <Toggle 
+              label="Currently Building" 
+              desc="Show what you're currently working on" 
+              checked={settings.statusWidgets?.currentlyBuilding?.enabled ?? false} 
+              onChange={e => set('statusWidgets.currentlyBuilding.enabled', e.target.checked)} 
+            />
+            {settings.statusWidgets?.currentlyBuilding?.enabled && (
+              <div className="space-y-3 pl-4">
+                <div>
+                  <label className={LABEL_CLS}>Project Name</label>
+                  <input value={settings.statusWidgets?.currentlyBuilding?.projectName || ''} onChange={e => set('statusWidgets.currentlyBuilding.projectName', e.target.value)} placeholder="Project name" className={INPUT_CLS} />
+                </div>
+                <div>
+                  <label className={LABEL_CLS}>Description</label>
+                  <input value={settings.statusWidgets?.currentlyBuilding?.description || ''} onChange={e => set('statusWidgets.currentlyBuilding.description', e.target.value)} placeholder="Short description" className={INPUT_CLS} />
+                </div>
+                <div>
+                  <label className={LABEL_CLS}>Technologies (comma-separated)</label>
+                  <input value={settings.statusWidgets?.currentlyBuilding?.technologies || ''} onChange={e => set('statusWidgets.currentlyBuilding.technologies', e.target.value)} placeholder="React, Node.js, etc." className={INPUT_CLS} />
+                </div>
+                <div>
+                  <label className={LABEL_CLS}>Progress (%)</label>
+                  <input type="number" min="0" max="100" value={settings.statusWidgets?.currentlyBuilding?.progress ?? 0} onChange={e => set('statusWidgets.currentlyBuilding.progress', parseInt(e.target.value))} placeholder="0-100" className={INPUT_CLS} />
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
+
         {/* SEO */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
           className="bg-white/5 border border-white/10 rounded-2xl p-6 space-y-4">
@@ -127,16 +204,25 @@ function SettingsContent() {
             <Toggle label="Blog" desc="Enable the blog section" checked={settings.features?.blog?.enabled ?? true} onChange={e => set('features.blog.enabled', e.target.checked)} />
             <Toggle label="Portfolio" desc="Enable the projects section" checked={settings.features?.portfolio?.enabled ?? true} onChange={e => set('features.portfolio.enabled', e.target.checked)} />
             <Toggle label="Contact Form" desc="Allow visitors to send messages" checked={settings.features?.contact?.enabled ?? true} onChange={e => set('features.contact.enabled', e.target.checked)} />
-            <Toggle label="Analytics" desc="Enable analytics tracking" checked={settings.features?.analytics?.enabled ?? false} onChange={e => set('features.analytics.enabled', e.target.checked)} />
+            <Toggle label="Analytics" desc="Enable visitor tracking" checked={settings.features?.analytics?.enabled ?? false} onChange={e => set('features.analytics.enabled', e.target.checked)} />
           </div>
         </motion.div>
 
-        {status === 'ok'  && <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm"><HiCheckCircle size={16} /> Settings saved</div>}
-        {status === 'err' && <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm"><HiXCircle size={16} /> Failed to save</div>}
+        {/* Status */}
+        {status === 'ok' && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-sm">
+            <HiCheckCircle size={16} /> Saved successfully
+          </div>
+        )}
+        {status === 'err' && (
+          <div className="flex items-center gap-2 px-4 py-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm">
+            <HiXCircle size={16} /> Failed to save. Please try again.
+          </div>
+        )}
 
         <button type="submit" disabled={loading}
           className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold hover:from-violet-400 hover:to-pink-400 transition-all shadow-lg shadow-violet-500/25 disabled:opacity-50">
-          {loading ? 'Saving…' : 'Save Settings'}
+          {loading ? 'Saving…' : 'Save Changes'}
         </button>
       </form>
     </div>

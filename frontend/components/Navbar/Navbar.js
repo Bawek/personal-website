@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { FaGithub, FaLinkedinIn } from 'react-icons/fa'
 import { AiOutlineMenu, AiOutlineClose } from 'react-icons/ai'
 import { motion, AnimatePresence } from 'framer-motion'
+import DarkModeToggle from '@/components/DarkModeToggle'
 
 const NAV_LINKS = [
   { label: 'About',      href: '/about'      },
@@ -35,8 +36,8 @@ export default function Navbar() {
       <header
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'bg-bg/80 backdrop-blur-md border-b border-white/5 shadow-lg shadow-black/20'
-            : 'bg-transparent'
+            ? 'bg-bg/80 backdrop-blur-md border-b border-white/5 shadow-lg shadow-black/20 dark:bg-light-bg/90 dark:border-gray-200'
+            : 'bg-transparent dark:bg-light-bg'
         }`}
       >
         <nav className="section-wrapper flex items-center justify-between h-16" aria-label="Main navigation">
@@ -55,7 +56,7 @@ export default function Navbar() {
               <li key={label}>
                 <Link
                   href={href}
-                  className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200 font-medium"
+                  className="px-4 py-2 text-sm text-gray-400 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200 font-medium dark:text-gray-600 dark:hover:text-gray-900 dark:hover:bg-gray-200"
                 >
                   {label}
                 </Link>
@@ -65,6 +66,7 @@ export default function Navbar() {
 
           {/* Desktop social + CTA */}
           <div className="hidden md:flex items-center gap-3">
+            <DarkModeToggle />
             <a
               href="https://github.com/Bawek"
               target="_blank"
@@ -121,7 +123,7 @@ export default function Navbar() {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-surface border-l border-white/10 p-6 flex flex-col md:hidden"
+              className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-surface border-l border-white/10 p-6 flex flex-col md:hidden dark:bg-light-surface dark:border-gray-300"
             >
               <div className="flex items-center justify-between mb-8">
                 <span className="font-mono font-bold gradient-text">baweke.dev</span>
@@ -140,7 +142,7 @@ export default function Navbar() {
                     <Link
                       href={href}
                       onClick={() => setOpen(false)}
-                      className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 font-medium"
+                      className="block px-4 py-3 text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-all duration-200 font-medium dark:text-gray-700 dark:hover:text-gray-900 dark:hover:bg-gray-200"
                     >
                       {label}
                     </Link>
@@ -148,8 +150,11 @@ export default function Navbar() {
                 ))}
               </ul>
 
-              <div className="pt-6 border-t border-white/10">
-                <p className="text-xs text-gray-500 mb-4 font-mono tracking-widest uppercase">Connect</p>
+              <div className="pt-6 border-t border-white/10 dark:border-gray-300">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs text-gray-500 font-mono tracking-widest uppercase">Connect</p>
+                  <DarkModeToggle />
+                </div>
                 <div className="flex gap-3">
                   <a href="https://github.com/Bawek" target="_blank" rel="noreferrer" className="btn-icon" aria-label="GitHub">
                     <FaGithub size={16} />

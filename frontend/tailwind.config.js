@@ -1,5 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+  darkMode: 'class', // Enable class-based dark mode
   content: [
     './app/**/*.{js,ts,jsx,tsx}',
     './pages/**/*.{js,ts,jsx,tsx}',
@@ -15,6 +16,10 @@ module.exports = {
         bg: '#0f0f17',
         surface: '#16161e',
         'surface-2': '#1e1e2e',
+        // Light mode colors
+        'light-bg': '#ffffff',
+        'light-surface': '#f8f9fa',
+        'light-surface-2': '#e9ecef',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-out',

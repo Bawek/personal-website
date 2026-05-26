@@ -13,6 +13,11 @@ const aboutSchema = new mongoose.Schema({
     description: {
       type: String,
       default: ''
+    },
+    // Add professional photo field
+    photoUrl: {
+      type: String,
+      default: ''
     }
   },
   whoAmI: {
@@ -24,6 +29,44 @@ const aboutSchema = new mongoose.Schema({
       type: String,
       default: 'I am a Software Engineer who\'s passionate & enthusiastic about creating web applications.'
     }
+  },
+  // AI/ML philosophy section for PRD compliance
+  philosophy: {
+    title: {
+      type: String,
+      default: 'My Philosophy'
+    },
+    description: {
+      type: String,
+      default: ''
+    },
+    aiMLApproach: {
+      type: String,
+      default: ''
+    }
+  },
+  // Personal interests and side projects
+  interests: {
+    title: {
+      type: String,
+      default: 'Personal Interests'
+    },
+    items: [{
+      name: String,
+      description: String,
+      icon: String
+    }]
+  },
+  // Professional values
+  values: {
+    title: {
+      type: String,
+      default: 'Professional Values'
+    },
+    items: [{
+      name: String,
+      description: String
+    }]
   },
   resume: {
     buttonText: {
