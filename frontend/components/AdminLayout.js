@@ -15,6 +15,7 @@ const NAV = [
   { label: 'About',      href: '/admin/about',      icon: HiUser        },
   { label: 'Contact',    href: '/admin/contact',    icon: HiMail        },
   { label: 'Content',    href: '/admin/content',    icon: HiDocumentText },
+  { label: 'Footer',     href: '/admin/footer',     icon: HiCog         },
   { label: 'Sync',       href: '/admin/sync',       icon: HiRefresh     },
   { label: 'Settings',   href: '/admin/settings',   icon: HiCog         },
 ]

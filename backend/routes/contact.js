@@ -54,6 +54,30 @@ router.put('/', authenticate, async (req, res) => {
   }
 });
 
+// GET /api/contact/messages/stats - Get message statistics
+router.get('/stats', authenticate, async (req, res) => {
+  try {
+    const total = await Message.countDocuments();
+    const unread = await Message.countDocuments({ read: false });
+    const read = await Message.countDocuments({ read: true });
+    
+    res.json({
+      success: true,
+      stats: {
+        total,
+        unread,
+        read
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching message stats:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch message stats'
+    });
+  }
+});
+
 // GET /api/contact/messages - Get all messages for the authenticated user
 router.get('/messages', authenticate, async (req, res) => {
   try {
@@ -141,6 +165,36 @@ router.patch('/messages/:id/read', authenticate, async (req, res) => {
   }
 });
 
+// PATCH /api/contact/messages/bulk/read - Mark multiple messages as read
+router.patch('/bulk/read', authenticate, async (req, res) => {
+  try {
+    const { ids } = req.body;
+    
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid message IDs'
+      });
+    }
+    
+    await Message.updateMany(
+      { _id: { $in: ids } },
+      { read: true }
+    );
+    
+    res.json({
+      success: true,
+      message: `${ids.length} message(s) marked as read`
+    });
+  } catch (error) {
+    console.error('Error marking messages as read:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update messages'
+    });
+  }
+});
+
 // DELETE /api/contact/messages/:id - Delete a message
 router.delete('/messages/:id', authenticate, async (req, res) => {
   try {
@@ -164,6 +218,33 @@ router.delete('/messages/:id', authenticate, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to delete message'
+    });
+  }
+});
+
+// DELETE /api/contact/messages/bulk/delete - Delete multiple messages
+router.delete('/bulk/delete', authenticate, async (req, res) => {
+  try {
+    const { ids } = req.body;
+    
+    if (!Array.isArray(ids) || ids.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid message IDs'
+      });
+    }
+    
+    const result = await Message.deleteMany({ _id: { $in: ids } });
+    
+    res.json({
+      success: true,
+      message: `${result.deletedCount} message(s) deleted successfully`
+    });
+  } catch (error) {
+    console.error('Error deleting messages:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete messages'
     });
   }
 });

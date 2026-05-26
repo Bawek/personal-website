@@ -98,6 +98,47 @@ const settingsSchema = new mongoose.Schema({
       name: String,
       flag: String
     }]
+  },
+  footer: {
+    companyName: {
+      type: String,
+      default: 'Your Name'
+    },
+    copyrightText: {
+      type: String,
+      default: '© 2026 Your Name. All rights reserved.'
+    },
+    description: {
+      type: String,
+      default: 'Built with Next.js & Tailwind CSS'
+    },
+    links: [{
+      label: String,
+      url: String,
+      category: String,
+      order: Number
+    }],
+    socialLinks: [{
+      platform: String,
+      url: String,
+      icon: String
+    }],
+    newsletter: {
+      enabled: {
+        type: Boolean,
+        default: false
+      },
+      title: String,
+      description: String
+    },
+    contact: {
+      enabled: {
+        type: Boolean,
+        default: true
+      },
+      email: String,
+      phone: String
+    }
   }
 }, {
   timestamps: true

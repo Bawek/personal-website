@@ -19,6 +19,20 @@ const contactSchema = new mongoose.Schema({
     description: {
       type: String,
       default: 'We\'d love to hear from you...'
+    },
+    responseTime: {
+      type: String,
+      default: 'I typically respond within 48 hours.'
+    },
+    placeholder: {
+      type: String,
+      default: 'Tell me about your project…'
+    }
+  },
+  footer: {
+    text: {
+      type: String,
+      default: 'Built with Next.js & Tailwind.'
     }
   },
   social: {

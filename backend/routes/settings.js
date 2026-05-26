@@ -135,4 +135,29 @@ router.put('/languages', authenticate, authorize('admin'), [
   }
 });
 
+// PUT /api/settings/footer — admin or editor
+router.put('/footer', authenticate, authorize('admin', 'editor'), [
+  body('companyName').optional().trim().notEmpty().withMessage('Company name cannot be empty'),
+  body('copyrightText').optional().trim(),
+  body('description').optional().trim(),
+  body('links').optional().isArray().withMessage('Links must be an array'),
+  body('socialLinks').optional().isArray().withMessage('Social links must be an array'),
+  body('newsletter.enabled').optional().isBoolean().withMessage('Newsletter enabled must be boolean'),
+  body('contact.enabled').optional().isBoolean().withMessage('Contact enabled must be boolean'),
+  body('contact.email').optional().isEmail().withMessage('Invalid email address'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    const settings = await Settings.getSettings();
+    settings.footer = { ...settings.footer, ...req.body };
+    await settings.save();
+    res.json({ message: 'Footer settings updated successfully', footer: settings.footer });
+  } catch (error) {
+    console.error('Update footer error:', error);
+    res.status(500).json({ message: 'Server error while updating footer settings' });
+  }
+});
+
 module.exports = router;
