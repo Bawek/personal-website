@@ -12,7 +12,8 @@ const LEVEL_COLORS = {
   beginner:     'bg-gray-500/10    text-gray-400    border-gray-500/20',
 }
 
-const INIT = { name: '', category: '', level: 'intermediate' }
+const INIT = { name: '', category: '', level: 'intermediate', customCategory: '' }
+const PREDEFINED_CATEGORIES = ['frontend', 'backend', 'database', 'tools']
 
 function SkillsContent() {
   const [skills, setSkills]   = useState([])
@@ -22,6 +23,7 @@ function SkillsContent() {
   const [editing, setEditing] = useState(null)
   const [form, setForm]       = useState(INIT)
   const [showForm, setShowForm] = useState(false)
+  const [useCustomCategory, setUseCustomCategory] = useState(false)
 
   const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` })
 
@@ -35,15 +37,26 @@ function SkillsContent() {
 
   useEffect(() => { fetchSkills() }, [])
 
-  const openNew  = () => { setForm(INIT); setEditing(null); setShowForm(true); setError('') }
-  const openEdit = (s) => { setForm({ name: s.name, category: s.category, level: s.level }); setEditing(s); setShowForm(true); setError('') }
-  const closeForm = () => { setShowForm(false); setEditing(null); setForm(INIT) }
+  const openNew  = () => { setForm(INIT); setEditing(null); setShowForm(true); setError(''); setUseCustomCategory(false) }
+  const openEdit = (s) => { 
+    const isCustom = !PREDEFINED_CATEGORIES.includes(s.category)
+    setForm({ name: s.name, category: isCustom ? '' : s.category, level: s.level, customCategory: isCustom ? s.category : '' })
+    setEditing(s)
+    setShowForm(true)
+    setError('')
+    setUseCustomCategory(isCustom)
+  }
+  const closeForm = () => { setShowForm(false); setEditing(null); setForm(INIT); setUseCustomCategory(false) }
 
   const handleSubmit = async (e) => {
     e.preventDefault(); setSaving(true); setError('')
     try {
-      if (editing) await api.put(`/skills/${editing.slug}`, form, { headers: headers() })
-      else         await api.post('/skills', form, { headers: headers() })
+      const finalCategory = useCustomCategory ? form.customCategory : form.category
+      if (!finalCategory) { setError('Please select or enter a category'); setSaving(false); return }
+      
+      const submitData = { name: form.name, category: finalCategory, level: form.level }
+      if (editing) await api.put(`/skills/${editing.slug}`, submitData, { headers: headers() })
+      else         await api.post('/skills', submitData, { headers: headers() })
       await fetchSkills(); closeForm()
     } catch (err) { setError(err.response?.data?.message || 'Failed to save') }
     finally { setSaving(false) }
@@ -93,11 +106,28 @@ function SkillsContent() {
             </div>
             <div>
               <label className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Category</label>
-              <select required value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
-                className="admin-select">
-                <option value="">Select…</option>
-                {['frontend','backend','database','tools','other'].map(c => <option key={c} value={c} className="capitalize">{c}</option>)}
-              </select>
+              {!useCustomCategory ? (
+                <div className="space-y-2">
+                  <select required value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}
+                    className="admin-select">
+                    <option value="">Select…</option>
+                    {PREDEFINED_CATEGORIES.map(c => <option key={c} value={c} className="capitalize">{c}</option>)}
+                  </select>
+                  <button type="button" onClick={() => setUseCustomCategory(true)}
+                    className="w-full text-xs text-violet-400 hover:text-violet-300 py-1 px-2 rounded border border-violet-500/30 hover:border-violet-500/50 transition-all">
+                    + Add Custom Category
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <input required value={form.customCategory} onChange={e => setForm({ ...form, customCategory: e.target.value })}
+                    placeholder="e.g. DevOps, Mobile, AI" className="admin-input" />
+                  <button type="button" onClick={() => { setUseCustomCategory(false); setForm({ ...form, customCategory: '' }) }}
+                    className="w-full text-xs text-gray-400 hover:text-gray-300 py-1 px-2 rounded border border-gray-500/30 hover:border-gray-500/50 transition-all">
+                    Use Predefined Category
+                  </button>
+                </div>
+              )}
             </div>
             <div>
               <label className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Level</label>

@@ -15,7 +15,6 @@ const skillSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: ['frontend', 'backend', 'database', 'tools', 'other'],
     set: (v) => v ? v.toLowerCase() : v,
   },
   level: {
