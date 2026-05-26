@@ -10,7 +10,8 @@ const skillSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    lowercase: true
+    lowercase: true,
+    index: true
   },
   category: {
     type: String,
@@ -46,6 +47,5 @@ skillSchema.pre('validate', function(next) {
 // Index for better query performance
 skillSchema.index({ createdBy: 1, category: 1 });
 skillSchema.index({ createdBy: 1, level: 1 });
-skillSchema.index({ slug: 1 });
 
 module.exports = mongoose.model('Skill', skillSchema);

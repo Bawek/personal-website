@@ -57,7 +57,7 @@ app.use(cors({
         if (allowedOrigins.includes(origin)) return callback(null, true);
         callback(new Error(`CORS origin denied: ${origin}`));
       })
-    : ['http://localhost:3000'],
+    : true,
   credentials: true,
 }));
 
