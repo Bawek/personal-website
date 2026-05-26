@@ -33,8 +33,8 @@ const skillSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Create slug from name before saving
-skillSchema.pre('save', function(next) {
+// Create slug from name before validation
+skillSchema.pre('validate', function(next) {
   if (this.isModified('name') && !this.slug) {
     this.slug = this.name
       .toLowerCase()

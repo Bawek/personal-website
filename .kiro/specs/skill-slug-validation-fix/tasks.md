@@ -1,0 +1,85 @@
+# Implementation Plan
+
+- [ ] 1. Write bug condition exploration test
+  - **Property 1: Bug Condition** - Auto-Generated Slug Creation
+  - **CRITICAL**: This test MUST FAIL on unfixed code - failure confirms the bug exists
+  - **DO NOT attempt to fix the test or the code when it fails**
+  - **NOTE**: This test encodes the expected behavior - it will validate the fix when it passes after implementation
+  - **GOAL**: Surface counterexamples that demonstrate the bug exists
+  - **Scoped PBT Approach**: For deterministic bugs, scope the property to the concrete failing case(s) to ensure reproducibility
+  - Test that creating a skill via POST /api/skills without an explicit slug value fails with validation error "slug: Path `slug` is required"
+  - Test cases to include:
+    - Basic skill creation: `{ name: "React", category: "frontend", level: "advanced" }`
+    - Special characters in name: `{ name: "Node.js", category: "backend", level: "expert" }`
+    - Multiple word name: `{ name: "Machine Learning", category: "other", level: "intermediate" }`
+    - Edge case with special characters: `{ name: "C++", category: "backend", level: "advanced" }`
+  - The test assertions should verify that after the fix:
+    - Skill creation succeeds (status 201)
+    - Slug is automatically generated from the name
+    - Slug follows the format: lowercase alphanumeric with hyphens
+    - Slug matches the expected transformation of the name
+  - Run test on UNFIXED code
+  - **EXPECTED OUTCOME**: Test FAILS with "Skill validation failed: slug: Path `slug` is required" (this is correct - it proves the bug exists)
+  - Document counterexamples found to understand root cause
+  - Mark task complete when test is written, run, and failure is documented
+  - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3_
+
+- [~] 2. Write preservation property tests (BEFORE implementing fix)
+  - **Property 2: Preservation** - Explicit Slug and Existing Operations
+  - **IMPORTANT**: Follow observation-first methodology
+  - Observe behavior on UNFIXED code for non-buggy inputs (cases where explicit slug is provided or operations on existing skills)
+  - Write property-based tests capturing observed behavior patterns from Preservation Requirements:
+    - Test 1: Skill creation with explicit slug value continues to use the provided slug
+    - Test 2: GET /api/skills/:slug continues to retrieve skills correctly
+    - Test 3: PUT /api/skills/:slug continues to update skills correctly
+    - Test 4: DELETE /api/skills/:slug continues to delete skills correctly
+    - Test 5: Updating a skill's name continues to regenerate the slug
+    - Test 6: Duplicate name checking continues to prevent duplicate skill names per user
+    - Test 7: Slug uniqueness constraint continues to be enforced
+  - Property-based testing generates many test cases for stronger guarantees
+  - Run tests on UNFIXED code
+  - **EXPECTED OUTCOME**: Tests PASS (this confirms baseline behavior to preserve)
+  - Mark task complete when tests are written, run, and passing on unfixed code
+  - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+
+- [ ] 3. Fix for slug validation error
+
+  - [~] 3.1 Implement the fix in backend/models/Skill.js
+    - Change the pre-save hook to a pre-validate hook to ensure slug generation occurs before validation
+    - Replace `skillSchema.pre('save', function(next) {` with `skillSchema.pre('validate', function(next) {`
+    - Keep the same slug generation logic:
+      - Check if name is modified and slug is not provided: `if (this.isModified('name') && !this.slug)`
+      - Generate slug from name: lowercase, replace non-alphanumeric with hyphens, remove leading/trailing hyphens
+    - Verify the condition logic handles both new documents and name updates correctly
+    - _Bug_Condition: isBugCondition(input) where input.slug is undefined/null AND input.name is defined AND requestMethod is 'POST' AND endpoint is '/api/skills'_
+    - _Expected_Behavior: For all inputs where isBugCondition(input) is true, the system automatically generates a slug from the skill name before validation occurs, allowing successful skill creation with status 201 and properly formatted slug_
+    - _Preservation: Skills created with explicit slug values continue to use that slug; slug regeneration on name updates continues to work; GET/PUT/DELETE by slug continue to function correctly; duplicate name checking and slug uniqueness enforcement continue unchanged_
+    - _Requirements: 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 3.4, 3.5_
+
+  - [~] 3.2 Verify bug condition exploration test now passes
+    - **Property 1: Expected Behavior** - Auto-Generated Slug Creation
+    - **IMPORTANT**: Re-run the SAME test from task 1 - do NOT write a new test
+    - The test from task 1 encodes the expected behavior
+    - When this test passes, it confirms the expected behavior is satisfied
+    - Run bug condition exploration test from step 1
+    - **EXPECTED OUTCOME**: Test PASSES (confirms bug is fixed)
+    - Verify that:
+      - All skill creation requests without explicit slug now succeed
+      - Slugs are correctly generated from skill names
+      - Status code is 201 for successful creation
+      - Generated slugs follow the correct format
+    - _Requirements: 2.1, 2.2, 2.3_
+
+  - [~] 3.3 Verify preservation tests still pass
+    - **Property 2: Preservation** - Explicit Slug and Existing Operations
+    - **IMPORTANT**: Re-run the SAME tests from task 2 - do NOT write new tests
+    - Run preservation property tests from step 2
+    - **EXPECTED OUTCOME**: Tests PASS (confirms no regressions)
+    - Confirm all tests still pass after fix:
+      - Explicit slug provision works correctly
+      - GET/PUT/DELETE by slug operations unchanged
+      - Name update slug regeneration unchanged
+      - Duplicate checking and uniqueness enforcement unchanged
+
+- [~] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

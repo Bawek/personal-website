@@ -24,5 +24,11 @@
     "mongoose": "^8.23.0",
     "multer": "^2.1.1",
     "nodemon": "^3.1.14"
+  },
+  "devDependencies": {
+    "fast-check": "^4.8.0",
+    "jest": "^30.4.2",
+    "mongodb-memory-server": "^11.1.0",
+    "supertest": "^7.2.2"
   }
 }
