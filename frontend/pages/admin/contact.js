@@ -31,13 +31,23 @@ function ContactContent() {
 
   const startChat = async (message) => {
     try {
+      // Get the current user ID from localStorage
+      const userStr = localStorage.getItem('user')
+      const user = userStr ? JSON.parse(userStr) : null
+      const userId = user?.id
+      
+      if (!userId) {
+        alert('User ID not found. Please log in again.')
+        return
+      }
+
       // Start a new conversation with the message sender
       const { data } = await api.post('/chat/start', {
         visitorName: message.name,
         visitorEmail: message.email,
         subject: message.subject || 'Follow-up to contact form',
         category: 'support',
-        createdBy: localStorage.getItem('userId') || 'default'
+        createdBy: userId
       }, { headers: headers() })
 
       // Navigate to chat page with the conversation ID

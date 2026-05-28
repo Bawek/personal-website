@@ -288,7 +288,7 @@ export default function Contact({ content, settings }) {
       </div>
 
       {/* Chat Widget */}
-      {isChatEnabled && <ChatWidget userId={settings?._id || 'default'} chatSettings={chatSettings} />}
+      {isChatEnabled && <ChatWidget userId={settings?.createdBy || settings?._id} chatSettings={chatSettings} />}
     </section>
   )
 }

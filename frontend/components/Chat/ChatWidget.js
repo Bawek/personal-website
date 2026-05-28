@@ -44,6 +44,11 @@ export default function ChatWidget({ userId, chatSettings }) {
       return
     }
 
+    if (!userId) {
+      alert('User ID not found. Please refresh the page.')
+      return
+    }
+
     setLoading(true)
     try {
       const { data } = await api.post('/chat/start', {

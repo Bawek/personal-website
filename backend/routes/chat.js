@@ -16,6 +16,14 @@ router.post('/start', async (req, res) => {
       });
     }
 
+    // Validate createdBy is a valid MongoDB ObjectId
+    if (!createdBy.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID format'
+      });
+    }
+
     // Check if conversation already exists for this email
     let conversation = await Conversation.findOne({
       visitorEmail: visitorEmail.toLowerCase(),
