@@ -1,16 +1,19 @@
 import { useState, useEffect } from 'react'
+import dynamic from 'next/dynamic'
 import Navbar from '@/components/Navbar/Navbar'
 import Hero from '@/components/Hero/Hero'
 import About from '@/components/About/About'
-import Experience from '@/components/Experience/Experience'
-import Skills from '@/components/Skills/Skills'
-import Projects from '@/components/Projects/Projects'
-import LatestArticles from '@/components/LatestArticles/LatestArticles'
-import Testimonials from '@/components/Testimonials/Testimonials'
-import Contact from '@/components/Contact/Contact'
 import AdminLoginButton from '@/components/AdminLoginButton'
 import SeoHead, { personJsonLd } from '@/components/SeoHead/SeoHead'
 import { projectsAPI, skillsAPI, experienceAPI, aboutAPI, contactAPI, settingsAPI } from '@/lib/api'
+
+// Lazy load heavy components
+const Experience = dynamic(() => import('@/components/Experience/Experience'), { loading: () => <div className="h-96" /> })
+const Skills = dynamic(() => import('@/components/Skills/Skills'), { loading: () => <div className="h-96" /> })
+const Projects = dynamic(() => import('@/components/Projects/Projects'), { loading: () => <div className="h-96" /> })
+const LatestArticles = dynamic(() => import('@/components/LatestArticles/LatestArticles'), { loading: () => <div className="h-96" /> })
+const Testimonials = dynamic(() => import('@/components/Testimonials/Testimonials'), { loading: () => <div className="h-96" /> })
+const Contact = dynamic(() => import('@/components/Contact/Contact'), { loading: () => <div className="h-96" /> })
 
 export default function Home() {
   const [settings, setSettings] = useState(null)
