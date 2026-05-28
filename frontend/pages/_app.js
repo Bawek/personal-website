@@ -41,6 +41,7 @@ export default function App({ Component, pageProps }) {
         </a>
         <Component {...pageProps} />
         <BackToTop />
+        <h1>footer page</h1>
         <Footer footerData={footerData} settings={settings} />
       </LanguageProvider>
     </ThemeProvider>
