@@ -1,4 +1,5 @@
 import { motion } from 'framer-motion'
+import Link from 'next/link'
 import { FaGithub, FaLinkedinIn, FaTwitter, FaEnvelope } from 'react-icons/fa'
 
 const PLATFORM_ICONS = {
@@ -142,10 +143,10 @@ export default function Footer({ footerData, settings }) {
             >
               <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-widest">Other</h3>
               <ul className="space-y-2">
-                <li><Link href="/" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Home</Link></li>
-                <li><Link href="/projects" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Projects</Link></li>
-                <li><Link href="/contact" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Contact</Link></li>
-                <li><Link href="/skills" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Skills</Link></li>
+                <li><Link href="/" className="text-sm text-gray-400 hover:text-violet-400 transition-colors block">Home</Link></li>
+                <li><Link href="/projects" className="text-sm text-gray-400 hover:text-violet-400 transition-colors block">Projects</Link></li>
+                <li><Link href="/contact" className="text-sm text-gray-400 hover:text-violet-400 transition-colors block">Contact</Link></li>
+                <li><Link href="/skills" className="text-sm text-gray-400 hover:text-violet-400 transition-colors block">Skills</Link></li>
               </ul>
             </motion.div>
           )}
@@ -189,8 +190,8 @@ export default function Footer({ footerData, settings }) {
         <div className="pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-gray-600 font-mono">{copyrightText}</p>
           <div className="flex gap-4 text-xs text-gray-600">
-            <a href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</a>
-            <a href="/terms" className="hover:text-gray-400 transition-colors">Terms</a>
+            <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
           </div>
         </div>
       </div>
