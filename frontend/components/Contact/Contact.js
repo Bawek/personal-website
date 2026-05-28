@@ -6,13 +6,13 @@ import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
 import { contactAPI } from '@/lib/api'
 import { obfuscateEmail } from '@/lib/formatEmail'
 
-const DEFAULT_CONTACT = [
-  { icon: AiOutlineMail, label: 'Email', value: 'bawekeasres [at] gmail [dot] com', href: null, obfuscated: true },
-  { icon: FaLinkedinIn, label: 'LinkedIn', value: 'baweke-mekonnen-asres', href: 'https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/' },
-  { icon: FaGithub, label: 'GitHub', value: 'github.com/Bawek', href: 'https://github.com/Bawek' },
-]
-
-const PLATFORM_ICONS = { github: FaGithub, linkedin: FaLinkedinIn, email: AiOutlineMail }
+const PLATFORM_ICONS = { 
+  github: FaGithub, 
+  linkedin: FaLinkedinIn, 
+  email: AiOutlineMail,
+  github: FaGithub,
+  linkedin: FaLinkedinIn,
+}
 
 const INITIAL_FORM = { name: '', email: '', subject: '', message: '', website: '' }
 
@@ -45,8 +45,8 @@ export default function Contact({ content, settings }) {
     }
   }
 
-  const contactEmail = settings?.contactInfo?.email
-  const socialLinks = content?.social?.links?.length
+  // Get social links from contact data
+  const socialLinks = content?.social?.links && content.social.links.length > 0
     ? content.social.links.map((link) => {
         const key = link.platform?.toLowerCase()
         const Icon = PLATFORM_ICONS[key] || AiOutlineMail
@@ -59,7 +59,30 @@ export default function Contact({ content, settings }) {
           obfuscated: isEmail,
         }
       })
-    : DEFAULT_CONTACT
+    : [
+        // Fallback to settings contact info if no social links configured
+        {
+          icon: AiOutlineMail,
+          label: 'Email',
+          value: settings?.contactInfo?.email ? obfuscateEmail(settings.contactInfo.email) : 'bawekeasres [at] gmail [dot] com',
+          href: null,
+          obfuscated: true,
+        },
+        {
+          icon: FaLinkedinIn,
+          label: 'LinkedIn',
+          value: 'baweke-mekonnen-asres',
+          href: 'https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/',
+          obfuscated: false,
+        },
+        {
+          icon: FaGithub,
+          label: 'GitHub',
+          value: 'github.com/Bawek',
+          href: 'https://github.com/Bawek',
+          obfuscated: false,
+        },
+      ]
 
   const sectionTitle = content?.hero?.title || 'Get In Touch'
   const sectionSubtitle = content?.hero?.subtitle || 'Have a project in mind or just want to say hi? My inbox is always open.'

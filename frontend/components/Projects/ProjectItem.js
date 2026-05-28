@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { FaGithub, FaExternalLinkAlt } from 'react-icons/fa'
 import { HiStar } from 'react-icons/hi'
@@ -27,20 +28,12 @@ export default function ProjectItem({
       {/* Image with link */}
       <Link href={`/projects/${slug}`} className="relative h-48 bg-surface-2 overflow-hidden flex-shrink-0 block">
         {hasImage ? (
-          isDynamic ? (
-            <img
-              src={backgroundImg}
-              alt={title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          ) : (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={typeof backgroundImg === 'string' ? backgroundImg : backgroundImg?.src}
-              alt={title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            />
-          )
+          <Image
+            src={backgroundImg}
+            alt={title}
+            fill
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+          />
         ) : (
           /* Placeholder gradient */
           <div className="w-full h-full bg-gradient-to-br from-violet-900/40 to-pink-900/40 flex items-center justify-center">

@@ -142,10 +142,10 @@ export default function Footer({ footerData, settings }) {
             >
               <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-widest">Other</h3>
               <ul className="space-y-2">
-                <li><a href="/" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Home</a></li>
-                <li><a href="/projects" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Projects</a></li>
-                <li><a href="/contact" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Contact</a></li>
-                <li><a href="/skills" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Skills</a></li>
+                <li><Link href="/" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Home</Link></li>
+                <li><Link href="/projects" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Projects</Link></li>
+                <li><Link href="/contact" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Contact</Link></li>
+                <li><Link href="/skills" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Skills</Link></li>
               </ul>
             </motion.div>
           )}

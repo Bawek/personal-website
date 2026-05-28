@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import Image from 'next/image'
 import { HiPhotograph, HiX } from 'react-icons/hi'
 import {
   getImageFromPasteEvent,
@@ -165,8 +166,8 @@ export default function ImageUploadField({
         }`}
       >
         {displayPreview ? (
-          <div className="relative h-40 sm:h-48">
-            <img src={displayPreview} alt="Preview" className="w-full h-full object-cover rounded-lg" />
+          <div className="relative h-40 sm:h-48 w-full">
+            <Image src={displayPreview} alt="Preview" fill className="w-full h-full object-cover rounded-lg" />
             <button
               type="button"
               onClick={clearImage}
