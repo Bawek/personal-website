@@ -4,7 +4,7 @@ import { FaGithub, FaLinkedinIn, FaTwitter, FaEnvelope, FaArrowRight } from 'rea
 import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
 import { contactAPI } from '@/lib/api'
 import { obfuscateEmail } from '@/lib/formatEmail'
-import ChatWidget from './Chat/ChatWidget'
+import ChatWidget from '@/components/Chat/ChatWidget'
 
 const PLATFORM_ICONS = {
   github: FaGithub,
