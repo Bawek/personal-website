@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { HiX, HiPaperAirplane, HiChat } from 'react-icons/hi'
 import api from '@/lib/api'
 
-export default function ChatWidget({ userId }) {
+export default function ChatWidget({ userId, chatSettings }) {
   const [isOpen, setIsOpen] = useState(false)
   const [conversation, setConversation] = useState(null)
   const [messages, setMessages] = useState([])
@@ -18,6 +18,16 @@ export default function ChatWidget({ userId }) {
     category: 'inquiry'
   })
   const messagesEndRef = useRef(null)
+
+  // Use provided settings or defaults
+  const settings = chatSettings || {
+    title: 'Chat with us',
+    subtitle: 'We typically respond within 48 hours',
+    placeholder: 'Type your message...',
+    initialMessage: '👋 Hi! How can we help you today?',
+    buttonText: 'Start a conversation',
+    socialLinks: []
+  }
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -110,8 +120,8 @@ export default function ChatWidget({ userId }) {
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-2xl flex justify-between items-center">
               <div>
-                <h3 className="font-bold text-lg">Chat with us</h3>
-                <p className="text-sm text-blue-100">We typically respond within 48 hours</p>
+                <h3 className="font-bold text-lg">{settings.title}</h3>
+                <p className="text-sm text-blue-100">{settings.subtitle}</p>
               </div>
               <button
                 onClick={() => setIsOpen(false)}
@@ -131,15 +141,35 @@ export default function ChatWidget({ userId }) {
                 >
                   <div className="bg-white p-4 rounded-lg border border-gray-200">
                     <p className="text-gray-700 mb-4">
-                      👋 Hi! How can we help you today?
+                      {settings.initialMessage}
                     </p>
                     <button
                       onClick={() => setFormStep('form')}
                       className="w-full bg-blue-500 hover:bg-blue-600 text-white py-2 rounded-lg transition font-medium"
                     >
-                      Start a conversation
+                      {settings.buttonText}
                     </button>
                   </div>
+
+                  {/* Social Links */}
+                  {settings.socialLinks && settings.socialLinks.length > 0 && (
+                    <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-2">
+                      <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest">Connect with us</p>
+                      <div className="flex flex-wrap gap-2">
+                        {settings.socialLinks.map((link) => (
+                          <a
+                            key={link.id}
+                            href={link.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm rounded-full transition border border-blue-200"
+                          >
+                            {link.platform}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </motion.div>
               )}
 
@@ -271,7 +301,7 @@ export default function ChatWidget({ userId }) {
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    placeholder="Type your message..."
+                    placeholder={settings.placeholder}
                     className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     disabled={loading}
                   />

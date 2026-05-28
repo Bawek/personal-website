@@ -116,6 +116,30 @@ router.put('/features', authenticate, authorize('admin'), async (req, res) => {
   }
 });
 
+// PUT /api/settings/chat — admin only
+router.put('/chat', authenticate, authorize('admin'), [
+  body('enabled').optional().isBoolean().withMessage('Chat enabled must be boolean'),
+  body('title').optional().trim().notEmpty().withMessage('Chat title cannot be empty'),
+  body('subtitle').optional().trim(),
+  body('placeholder').optional().trim(),
+  body('initialMessage').optional().trim(),
+  body('buttonText').optional().trim(),
+  body('socialLinks').optional().isArray().withMessage('Social links must be an array'),
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+    const settings = await Settings.getSettings();
+    settings.features.chat = { ...settings.features.chat, ...req.body };
+    await settings.save();
+    res.json({ message: 'Chat settings updated successfully', chat: settings.features.chat });
+  } catch (error) {
+    console.error('Update chat settings error:', error);
+    res.status(500).json({ message: 'Server error while updating chat settings' });
+  }
+});
+
 // PUT /api/settings/languages — admin only
 router.put('/languages', authenticate, authorize('admin'), [
   body('default').optional().isIn(['en', 'am', 'es', 'fr', 'de', 'zh']).withMessage('Invalid default language'),

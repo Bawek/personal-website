@@ -45,6 +45,12 @@ export default function Contact({ content, settings }) {
     }
   }
 
+  // Get chat settings
+  const chatSettings = settings?.features?.chat
+
+  // Check if chat is enabled
+  const isChatEnabled = chatSettings?.enabled !== false
+
   // Get social links from contact data
   const socialLinks = content?.social?.links && content.social.links.length > 0
     ? content.social.links.map((link) => {
@@ -56,7 +62,6 @@ export default function Contact({ content, settings }) {
           label: link.platform,
           value: isEmail ? obfuscateEmail(link.url.replace(/^mailto:/, '')) : link.url.replace(/^https?:\/\/(www\.)?/, ''),
           href: isEmail ? null : (link.url.startsWith('http') ? link.url : `https://${link.url}`),
-          obfuscated: isEmail,
         }
       })
     : []
@@ -283,7 +288,7 @@ export default function Contact({ content, settings }) {
       </div>
 
       {/* Chat Widget */}
-      <ChatWidget userId={settings?._id || 'default'} />
+      {isChatEnabled && <ChatWidget userId={settings?._id || 'default'} chatSettings={chatSettings} />}
     </section>
   )
 }

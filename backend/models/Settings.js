@@ -76,6 +76,37 @@ const settingsSchema = new mongoose.Schema({
       },
       emailService: String
     },
+    chat: {
+      enabled: {
+        type: Boolean,
+        default: true
+      },
+      title: {
+        type: String,
+        default: 'Chat with us'
+      },
+      subtitle: {
+        type: String,
+        default: 'We typically respond within 48 hours'
+      },
+      placeholder: {
+        type: String,
+        default: 'Type your message...'
+      },
+      initialMessage: {
+        type: String,
+        default: '👋 Hi! How can we help you today?'
+      },
+      buttonText: {
+        type: String,
+        default: 'Start a conversation'
+      },
+      socialLinks: [{
+        platform: String,
+        url: String,
+        id: Number
+      }]
+    },
     analytics: {
       enabled: {
         type: Boolean,
