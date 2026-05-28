@@ -1,11 +1,32 @@
 import '@/styles/globals.css'
+import { useState, useEffect } from 'react'
 import { LanguageProvider } from '@/lib/LanguageContext'
 import { ThemeProvider } from '@/lib/ThemeContext'
 import BackToTop from '@/components/BackToTop/BackToTop'
+import Footer from '@/components/Footer/Footer'
 import Head from 'next/head'
-
+import { settingsAPI } from '@/lib/api'
 
 export default function App({ Component, pageProps }) {
+  const [footerData, setFooterData] = useState(null)
+  const [settings, setSettings] = useState(null)
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const { data } = await settingsAPI.get()
+        if (data.settings) {
+          setSettings(data.settings)
+          setFooterData(data.settings.footer)
+        }
+      } catch (err) {
+        console.error('Error fetching settings:', err)
+      }
+    }
+
+    fetchSettings()
+  }, [])
+
   return (
     <ThemeProvider>
       <LanguageProvider>
@@ -20,6 +41,7 @@ export default function App({ Component, pageProps }) {
         </a>
         <Component {...pageProps} />
         <BackToTop />
+        <Footer footerData={footerData} settings={settings} />
       </LanguageProvider>
     </ThemeProvider>
   )

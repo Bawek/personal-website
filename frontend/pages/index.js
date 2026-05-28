@@ -34,7 +34,9 @@ export default function Home() {
             experienceAPI.getAll(),
           ])
 
-        if (settingsRes.status === 'fulfilled') setSettings(settingsRes.value.data.settings)
+        if (settingsRes.status === 'fulfilled') {
+          setSettings(settingsRes.value.data.settings)
+        }
         if (aboutRes.status === 'fulfilled') setAboutData(aboutRes.value.data.about)
         if (contactRes.status === 'fulfilled') setContactData(contactRes.value.data.contact)
         if (skillsRes.status === 'fulfilled') setSkills(skillsRes.value.data.skills || [])

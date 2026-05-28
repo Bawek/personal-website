@@ -18,7 +18,9 @@ export default function ContactPage() {
           contactAPI.get(),
         ])
 
-        if (settingsRes.status === 'fulfilled') setSettings(settingsRes.value.data.settings)
+        if (settingsRes.status === 'fulfilled') {
+          setSettings(settingsRes.value.data.settings)
+        }
         if (contactRes.status === 'fulfilled') setContactData(contactRes.value.data.contact)
       } catch (err) {
         console.error('Error fetching content:', err)

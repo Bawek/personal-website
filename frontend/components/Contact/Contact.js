@@ -185,12 +185,6 @@ export default function Contact({ content, settings }) {
           </motion.div>
         </div>
       </div>
-
-      <div className="section-wrapper mt-20 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <p className="text-sm text-gray-600 font-mono">
-          © {new Date().getFullYear()} Baweke Mekonnen. Built with Next.js & Tailwind.
-        </p>
-      </div>
     </section>
   )
 }

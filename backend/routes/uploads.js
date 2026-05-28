@@ -1,27 +1,21 @@
 const express = require('express');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
+const cloudinary = require('cloudinary').v2;
 const { authenticate } = require('../middleware/auth');
 
 const router = express.Router();
 
 const ALLOWED_FOLDERS = ['general', 'about', 'content', 'projects'];
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    const folder = ALLOWED_FOLDERS.includes(req.query.folder) ? req.query.folder : 'general';
-    const uploadDir = path.join(__dirname, '../uploads', folder);
-    fs.mkdirSync(uploadDir, { recursive: true });
-    req.uploadFolder = folder;
-    cb(null, uploadDir);
-  },
-  filename(req, file, cb) {
-    const ext = path.extname(file.originalname) || '.png';
-    const unique = `${Date.now()}-${Math.round(Math.random() * 1e9)}`;
-    cb(null, `img-${unique}${ext}`);
-  },
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET
 });
+
+// Use memory storage for multer
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
@@ -33,21 +27,63 @@ const upload = multer({
 });
 
 // POST /api/uploads?folder=about|content|general|projects
-router.post('/', authenticate, upload.single('image'), (req, res) => {
+router.post('/', authenticate, upload.single('image'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ success: false, message: 'No image provided' });
     }
-    const folder = req.uploadFolder || 'general';
-    const baseUrl = process.env.BASE_URL || `${req.protocol}://${req.get('host')}`;
-    const fullUrl = `${baseUrl}/uploads/${folder}/${req.file.filename}`;
-    res.status(201).json({
-      success: true,
-      url: fullUrl,
-    });
+
+    const folder = ALLOWED_FOLDERS.includes(req.query.folder) ? req.query.folder : 'general';
+
+    // Upload to Cloudinary
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        folder: `personal-website/${folder}`,
+        resource_type: 'auto',
+        quality: 'auto',
+        fetch_format: 'auto'
+      },
+      (error, result) => {
+        if (error) {
+          console.error('Cloudinary upload error:', error);
+          return res.status(500).json({ success: false, message: 'Failed to upload image' });
+        }
+
+        res.status(201).json({
+          success: true,
+          url: result.secure_url,
+          publicId: result.public_id,
+          storage: 'cloudinary'
+        });
+      }
+    );
+
+    // Pipe the file buffer to Cloudinary
+    uploadStream.end(req.file.buffer);
   } catch (error) {
     console.error('Upload error:', error);
     res.status(500).json({ success: false, message: 'Failed to upload image' });
+  }
+});
+
+// DELETE /api/uploads/:publicId - Delete image from Cloudinary
+router.delete('/:publicId', authenticate, async (req, res) => {
+  try {
+    const { publicId } = req.params;
+
+    if (!publicId) {
+      return res.status(400).json({ success: false, message: 'Public ID is required' });
+    }
+
+    await cloudinary.uploader.destroy(publicId);
+
+    res.json({
+      success: true,
+      message: 'Image deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete error:', error);
+    res.status(500).json({ success: false, message: 'Failed to delete image' });
   }
 });
 
