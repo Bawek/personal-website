@@ -4,6 +4,7 @@ import { FaGithub, FaLinkedinIn, FaTwitter, FaEnvelope, FaArrowRight } from 'rea
 import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
 import { contactAPI } from '@/lib/api'
 import { obfuscateEmail } from '@/lib/formatEmail'
+import ChatWidget from './Chat/ChatWidget'
 
 const PLATFORM_ICONS = {
   github: FaGithub,
@@ -110,7 +111,7 @@ export default function Contact({ content, settings }) {
               transition={{ duration: 0.5 }}
               className="lg:col-span-2 space-y-4"
             >
-              {socialLinks.map(({ icon: Icon, label, value, href, obfuscated }) =>
+              {socialLinks.map(({ icon: Icon, label, value, href }) =>
                 href ? (
                   <motion.a
                     key={label}
@@ -280,6 +281,9 @@ export default function Contact({ content, settings }) {
           </motion.div>
         </div>
       </div>
+
+      {/* Chat Widget */}
+      <ChatWidget userId={settings?._id || 'default'} />
     </section>
   )
 }

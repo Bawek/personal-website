@@ -15,6 +15,7 @@ const skillRoutes = require('./routes/skills');
 const experienceRoutes = require('./routes/experience');
 const aboutRoutes = require('./routes/about');
 const contactRoutes = require('./routes/contact');
+const chatRoutes = require('./routes/chat');
 const syncRoutes = require('./routes/sync');
 const uploadRoutes = require('./routes/uploads');
 
@@ -91,6 +92,7 @@ app.use('/api/skills', skillRoutes);
 app.use('/api/experience', experienceRoutes);
 app.use('/api/about', aboutRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/chat', chatRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/uploads', uploadRoutes);
 
