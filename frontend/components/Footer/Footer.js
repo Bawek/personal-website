@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion'
-import Link from 'next/link'
 import { FaGithub, FaLinkedinIn, FaTwitter, FaEnvelope } from 'react-icons/fa'
 
 const PLATFORM_ICONS = {
@@ -12,13 +11,16 @@ const PLATFORM_ICONS = {
 
 export default function Footer({ footerData, settings }) {
   const footer = footerData || {}
-  const companyName = footer.companyName || settings?.siteName || 'Your Name'
+  const companyName = footer.companyName || settings?.siteName || 'Baweke Mekonnen'
   const copyrightText = footer.copyrightText || `© ${new Date().getFullYear()} ${companyName}. All rights reserved.`
-  const description = footer.description || 'Built with Next.js & Tailwind CSS'
+  const description = footer.description || 'Full-Stack Developer specializing in Next.js, React, Node.js, and modern web applications.'
   const links = footer.links || []
-  const socialLinks = footer.socialLinks || []
-  const newsletter = footer.newsletter || {}
-  const contact = footer.contact || {}
+  const socialLinks = footer.socialLinks || [
+    { id: 1, platform: 'GitHub', url: 'https://github.com/Bawek', icon: 'FaGithub' },
+    { id: 2, platform: 'LinkedIn', url: 'https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/', icon: 'FaLinkedinIn' },
+  ]
+  const newsletter = footer.newsletter || { enabled: false }
+  const contact = footer.contact || { enabled: true, email: 'bawekemekonen884@gmail.com', phone: '+251989131968' }
 
   // Group links by category
   const groupedLinks = links.reduce((acc, link) => {
@@ -81,13 +83,13 @@ export default function Footer({ footerData, settings }) {
             <p className="text-sm text-gray-400 mb-4">{description}</p>
 
             {/* Social Links */}
-            {socialLinks.length > 0 && (
+            {socialLinks && socialLinks.length > 0 && (
               <div className="flex gap-3">
                 {socialLinks.map((link) => {
                   const Icon = getSocialIcon(link.platform)
                   return (
                     <a
-                      key={link.id}
+                      key={link.id || link.platform}
                       href={link.url}
                       target="_blank"
                       rel="noreferrer"
@@ -103,33 +105,50 @@ export default function Footer({ footerData, settings }) {
           </motion.div>
 
           {/* Links Sections */}
-          {Object.entries(groupedLinks).map(([category, categoryLinks], idx) => (
+          {Object.keys(groupedLinks).length > 0 ? (
+            Object.entries(groupedLinks).map(([category, categoryLinks], idx) => (
+              <motion.div
+                key={category}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+              >
+                <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-widest">{category}</h3>
+                <ul className="space-y-2">
+                  {categoryLinks
+                    .sort((a, b) => (a.order || 0) - (b.order || 0))
+                    .map((link) => (
+                      <li key={link.id}>
+                        <a
+                          href={link.url}
+                          target={link.url.startsWith('http') ? '_blank' : undefined}
+                          rel={link.url.startsWith('http') ? 'noreferrer' : undefined}
+                          className="text-sm text-gray-400 hover:text-violet-400 transition-colors duration-200"
+                        >
+                          {link.label}
+                        </a>
+                      </li>
+                    ))}
+                </ul>
+              </motion.div>
+            ))
+          ) : (
             <motion.div
-              key={category}
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
             >
-              <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-widest">{category}</h3>
+              <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-widest">Other</h3>
               <ul className="space-y-2">
-                {categoryLinks
-                  .sort((a, b) => (a.order || 0) - (b.order || 0))
-                  .map((link) => (
-                    <li key={link.id}>
-                      <a
-                        href={link.url}
-                        target={link.url.startsWith('http') ? '_blank' : undefined}
-                        rel={link.url.startsWith('http') ? 'noreferrer' : undefined}
-                        className="text-sm text-gray-400 hover:text-violet-400 transition-colors duration-200"
-                      >
-                        {link.label}
-                      </a>
-                    </li>
-                  ))}
+                <li><a href="/" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Home</a></li>
+                <li><a href="/projects" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Projects</a></li>
+                <li><a href="/contact" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Contact</a></li>
+                <li><a href="/skills" className="text-sm text-gray-400 hover:text-violet-400 transition-colors">Skills</a></li>
               </ul>
             </motion.div>
-          ))}
+          )}
 
           {/* Contact Section */}
           {contact.enabled && (

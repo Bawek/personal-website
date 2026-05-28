@@ -7,13 +7,31 @@ import AdminLoginButton from '@/components/AdminLoginButton'
 import SeoHead, { personJsonLd } from '@/components/SeoHead/SeoHead'
 import { projectsAPI, skillsAPI, experienceAPI, aboutAPI, contactAPI, settingsAPI } from '@/lib/api'
 
-// Lazy load heavy components
-const Experience = dynamic(() => import('@/components/Experience/Experience'), { loading: () => <div className="h-96" /> })
-const Skills = dynamic(() => import('@/components/Skills/Skills'), { loading: () => <div className="h-96" /> })
-const Projects = dynamic(() => import('@/components/Projects/Projects'), { loading: () => <div className="h-96" /> })
-const LatestArticles = dynamic(() => import('@/components/LatestArticles/LatestArticles'), { loading: () => <div className="h-96" /> })
-const Testimonials = dynamic(() => import('@/components/Testimonials/Testimonials'), { loading: () => <div className="h-96" /> })
-const Contact = dynamic(() => import('@/components/Contact/Contact'), { loading: () => <div className="h-96" /> })
+// Lazy load heavy components with ssr disabled to prevent hydration issues
+const Experience = dynamic(() => import('@/components/Experience/Experience'), { 
+  ssr: false,
+  loading: () => null 
+})
+const Skills = dynamic(() => import('@/components/Skills/Skills'), { 
+  ssr: false,
+  loading: () => null 
+})
+const Projects = dynamic(() => import('@/components/Projects/Projects'), { 
+  ssr: false,
+  loading: () => null 
+})
+const LatestArticles = dynamic(() => import('@/components/LatestArticles/LatestArticles'), { 
+  ssr: false,
+  loading: () => null 
+})
+const Testimonials = dynamic(() => import('@/components/Testimonials/Testimonials'), { 
+  ssr: false,
+  loading: () => null 
+})
+const Contact = dynamic(() => import('@/components/Contact/Contact'), { 
+  ssr: false,
+  loading: () => null 
+})
 
 export default function Home() {
   const [settings, setSettings] = useState(null)
@@ -102,9 +120,9 @@ export default function Home() {
           statusWidgets={settings?.widgets}
         />
         <About content={aboutData} experience={experience} />
-        <Experience experience={experience} />
-        <Skills skills={skills} />
-        <Projects projects={projects} showFilters />
+        {experience.length > 0 && <Experience experience={experience} />}
+        {skills.length > 0 && <Skills skills={skills} />}
+        {projects.length > 0 && <Projects projects={projects} showFilters />}
         <LatestArticles limit={3} />
         <Testimonials />
         <Contact content={contactData} settings={settings} />
