@@ -1,25 +1,16 @@
 import { useState, useEffect } from 'react'
 import dynamic from 'next/dynamic'
+import Link from 'next/link'
 import Navbar from '@/components/Navbar/Navbar'
 import Hero from '@/components/Hero/Hero'
 import About from '@/components/About/About'
 import AdminLoginButton from '@/components/AdminLoginButton'
 import SeoHead, { personJsonLd } from '@/components/SeoHead/SeoHead'
 import { projectsAPI, skillsAPI, experienceAPI, aboutAPI, contactAPI, settingsAPI } from '@/lib/api'
+import { motion } from 'framer-motion'
+import { HiArrowRight } from 'react-icons/hi'
 
 // Lazy load heavy components with ssr disabled to prevent hydration issues
-const Experience = dynamic(() => import('@/components/Experience/Experience'), { 
-  ssr: false,
-  loading: () => null 
-})
-const Skills = dynamic(() => import('@/components/Skills/Skills'), { 
-  ssr: false,
-  loading: () => null 
-})
-const Projects = dynamic(() => import('@/components/Projects/Projects'), { 
-  ssr: false,
-  loading: () => null 
-})
 const LatestArticles = dynamic(() => import('@/components/LatestArticles/LatestArticles'), { 
   ssr: false,
   loading: () => null 
@@ -32,6 +23,174 @@ const Contact = dynamic(() => import('@/components/Contact/Contact'), {
   ssr: false,
   loading: () => null 
 })
+
+// Featured Projects Component
+function FeaturedProjects({ projects }) {
+  if (!projects || projects.length === 0) return null
+  
+  const featured = projects.filter(p => p.featured).slice(0, 3)
+  if (featured.length === 0) return null
+
+  return (
+    <section id="projects" className="py-24">
+      <div className="section-wrapper">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-12 flex items-end justify-between"
+        >
+          <div>
+            <p className="section-label mb-3">Portfolio</p>
+            <h2 className="text-gray-100">Featured Projects</h2>
+            <p className="text-gray-400 mt-3 max-w-xl">
+              A selection of my recent work and case studies.
+            </p>
+          </div>
+          <Link href="/projects" className="flex items-center gap-2 text-violet-400 hover:text-violet-300 transition-colors font-mono text-sm">
+            View All <HiArrowRight size={16} />
+          </Link>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {featured.map((project, idx) => (
+            <motion.a
+              key={project._id}
+              href={project.liveUrl || '#'}
+              target="_blank"
+              rel="noreferrer"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="group glass-card p-6 hover:border-violet-500/30 transition-all duration-300"
+            >
+              <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-violet-400 transition-colors">{project.title}</h3>
+              <p className="text-sm text-gray-400 mb-4">{project.description}</p>
+              <div className="flex flex-wrap gap-2">
+                {(project.techStack || []).slice(0, 3).map((tech) => (
+                  <span key={tech} className="text-xs px-2 py-1 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20">
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </motion.a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Featured Skills Component
+function FeaturedSkills({ skills }) {
+  if (!skills || skills.length === 0) return null
+  
+  const topSkills = skills.slice(0, 6)
+
+  return (
+    <section id="skills" className="py-24">
+      <div className="section-wrapper">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-12 flex items-end justify-between"
+        >
+          <div>
+            <p className="section-label mb-3">Expertise</p>
+            <h2 className="text-gray-100">Top Skills</h2>
+            <p className="text-gray-400 mt-3 max-w-xl">
+              Technologies and tools I work with regularly.
+            </p>
+          </div>
+          <Link href="/skills" className="flex items-center gap-2 text-violet-400 hover:text-violet-300 transition-colors font-mono text-sm">
+            View All <HiArrowRight size={16} />
+          </Link>
+        </motion.div>
+
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {topSkills.map((skill, idx) => (
+            <motion.div
+              key={skill._id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.05 }}
+              className="glass-card p-4 hover:border-violet-500/30 transition-all duration-300"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <h3 className="font-semibold text-white">{skill.name}</h3>
+                <span className="text-xs px-2 py-1 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/20 capitalize">
+                  {skill.level || 'Intermediate'}
+                </span>
+              </div>
+              {skill.description && <p className="text-xs text-gray-500">{skill.description}</p>}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// Featured Experience Component
+function FeaturedExperience({ experience }) {
+  if (!experience || experience.length === 0) return null
+  
+  const featured = experience.slice(0, 3)
+
+  return (
+    <section id="experience" className="py-24">
+      <div className="section-wrapper">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-12 flex items-end justify-between"
+        >
+          <div>
+            <p className="section-label mb-3">Career</p>
+            <h2 className="text-gray-100">Experience & Education</h2>
+            <p className="text-gray-400 mt-3 max-w-xl">
+              Work history, education, and professional development.
+            </p>
+          </div>
+          <Link href="/experience" className="flex items-center gap-2 text-violet-400 hover:text-violet-300 transition-colors font-mono text-sm">
+            View All <HiArrowRight size={16} />
+          </Link>
+        </motion.div>
+
+        <div className="space-y-4">
+          {featured.map((item, idx) => (
+            <motion.div
+              key={item._id}
+              initial={{ opacity: 0, x: -20 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: idx * 0.1 }}
+              className="glass-card p-6 hover:border-violet-500/30 transition-all duration-300"
+            >
+              <div className="flex items-start justify-between mb-2">
+                <div>
+                  <h3 className="font-semibold text-white">{item.title}</h3>
+                  <p className="text-sm text-violet-400">{item.company || item.institution}</p>
+                </div>
+                <span className="text-xs text-gray-500 font-mono whitespace-nowrap ml-4">
+                  {item.startDate && new Date(item.startDate).getFullYear()}
+                </span>
+              </div>
+              {item.description && <p className="text-sm text-gray-400">{item.description}</p>}
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
 
 export default function Home() {
   const [settings, setSettings] = useState(null)
@@ -120,9 +279,12 @@ export default function Home() {
           statusWidgets={settings?.widgets}
         />
         <About content={aboutData} experience={experience} />
-        {experience.length > 0 && <Experience experience={experience} />}
-        {skills.length > 0 && <Skills skills={skills} />}
-        {projects.length > 0 && <Projects projects={projects} showFilters />}
+        
+        {/* Featured Sections with View All Links */}
+        {experience.length > 0 && <FeaturedExperience experience={experience} />}
+        {skills.length > 0 && <FeaturedSkills skills={skills} />}
+        {projects.length > 0 && <FeaturedProjects projects={projects} />}
+        
         <LatestArticles limit={3} />
         <Testimonials />
         <Contact content={contactData} settings={settings} />

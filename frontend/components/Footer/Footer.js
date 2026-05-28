@@ -17,7 +17,7 @@ export default function Footer({ footerData, settings }) {
   const links = footer.links || []
   const socialLinks = footer.socialLinks || [
     { id: 1, platform: 'GitHub', url: 'https://github.com/Bawek', icon: 'FaGithub' },
-    { id: 2, platform: 'LinkedIn', url: 'https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/', icon: 'FaLinkedinIn' },
+    { id: 2, platform: 'LinkedIn', url: 'https://www.linkedin.com/in/baweke/', icon: 'FaLinkedinIn' },
   ]
   const newsletter = footer.newsletter || { enabled: false }
   const contact = footer.contact || { enabled: true, email: 'bawekemekonen884@gmail.com', phone: '+251989131968' }
