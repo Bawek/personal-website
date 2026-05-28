@@ -51,17 +51,26 @@ export default function ChatWidget({ userId, chatSettings }) {
 
     setLoading(true)
     try {
-      const { data } = await api.post('/chat/start', {
-        ...visitorInfo,
+      const payload = {
+        visitorName: visitorInfo.name,
+        visitorEmail: visitorInfo.email,
+        visitorPhone: visitorInfo.phone,
+        subject: visitorInfo.subject,
+        category: visitorInfo.category,
         createdBy: userId
-      })
+      }
+
+      console.log('Starting chat with payload:', payload)
+
+      const { data } = await api.post('/chat/start', payload)
 
       setConversation(data.conversation)
       setMessages(data.conversation.messages || [])
       setFormStep('chat')
     } catch (error) {
       console.error('Error starting chat:', error)
-      alert('Failed to start chat')
+      console.error('Error response:', error.response?.data)
+      alert('Failed to start chat: ' + (error.response?.data?.message || error.message))
     } finally {
       setLoading(false)
     }

@@ -16,10 +16,17 @@ export default function Footer({ footerData, settings }) {
   const copyrightText = footer.copyrightText || `© ${new Date().getFullYear()} ${companyName}. All rights reserved.`
   const description = footer.description || 'Full-Stack Developer specializing in Next.js, React, Node.js, and modern web applications.'
   const links = footer.links || []
-  const socialLinks = footer.socialLinks || [
+  
+  // Combine footer social links with chat social links
+  const footerSocialLinks = footer.socialLinks || []
+  const chatSocialLinks = settings?.features?.chat?.socialLinks || []
+  const socialLinks = [...footerSocialLinks, ...chatSocialLinks].filter((link, index, self) =>
+    index === self.findIndex((l) => l.platform === link.platform && l.url === link.url)
+  ) || [
     { id: 1, platform: 'GitHub', url: 'https://github.com/Bawek', icon: 'FaGithub' },
     { id: 2, platform: 'LinkedIn', url: 'https://www.linkedin.com/in/baweke/', icon: 'FaLinkedinIn' },
   ]
+  
   const newsletter = footer.newsletter || { enabled: false }
   const contact = footer.contact || { enabled: true, email: 'bawekemekonen884@gmail.com', phone: '+251989131968' }
 
@@ -85,22 +92,26 @@ export default function Footer({ footerData, settings }) {
 
             {/* Social Links */}
             {socialLinks && socialLinks.length > 0 && (
-              <div className="flex gap-3">
-                {socialLinks.map((link) => {
-                  const Icon = getSocialIcon(link.platform)
-                  return (
-                    <a
-                      key={link.id || link.platform}
-                      href={link.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-violet-400 hover:border-violet-500/30 hover:bg-violet-500/10 transition-all duration-200"
-                      aria-label={link.platform}
-                    >
-                      <Icon size={16} />
-                    </a>
-                  )
-                })}
+              <div className="space-y-3">
+                <p className="text-xs text-gray-500 font-mono uppercase tracking-widest">Connect</p>
+                <div className="flex gap-3 flex-wrap">
+                  {socialLinks.map((link) => {
+                    const Icon = getSocialIcon(link.platform)
+                    return (
+                      <a
+                        key={link.id || link.platform}
+                        href={link.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="w-9 h-9 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-violet-400 hover:border-violet-500/30 hover:bg-violet-500/10 transition-all duration-200"
+                        aria-label={link.platform}
+                        title={link.platform}
+                      >
+                        <Icon size={16} />
+                      </a>
+                    )
+                  })}
+                </div>
               </div>
             )}
           </motion.div>
@@ -182,6 +193,36 @@ export default function Footer({ footerData, settings }) {
                   </li>
                 )}
               </ul>
+            </motion.div>
+          )}
+
+          {/* Chat Social Links Section */}
+          {chatSocialLinks && chatSocialLinks.length > 0 && (
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
+              <h3 className="text-sm font-semibold text-white mb-4 uppercase tracking-widest">Follow</h3>
+              <div className="flex flex-wrap gap-2">
+                {chatSocialLinks.map((link) => {
+                  const Icon = getSocialIcon(link.platform)
+                  return (
+                    <a
+                      key={link.id || link.platform}
+                      href={link.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 text-xs rounded-lg bg-white/5 border border-white/10 text-gray-400 hover:text-violet-400 hover:border-violet-500/30 hover:bg-violet-500/10 transition-all duration-200 flex items-center gap-1.5"
+                      title={link.platform}
+                    >
+                      <Icon size={14} />
+                      <span>{link.platform}</span>
+                    </a>
+                  )
+                })}
+              </div>
             </motion.div>
           )}
         </div>

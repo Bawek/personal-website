@@ -41,20 +41,25 @@ function ContactContent() {
         return
       }
 
-      // Start a new conversation with the message sender
-      const { data } = await api.post('/chat/start', {
+      const payload = {
         visitorName: message.name,
         visitorEmail: message.email,
         subject: message.subject || 'Follow-up to contact form',
         category: 'support',
         createdBy: userId
-      }, { headers: headers() })
+      }
+
+      console.log('Starting chat from contact with payload:', payload)
+
+      // Start a new conversation with the message sender
+      const { data } = await api.post('/chat/start', payload, { headers: headers() })
 
       // Navigate to chat page with the conversation ID
       router.push(`/admin/chat?conversationId=${data.conversation._id}`)
     } catch (error) {
       console.error('Error starting chat:', error)
-      alert('Failed to start chat')
+      console.error('Error response:', error.response?.data)
+      alert('Failed to start chat: ' + (error.response?.data?.message || error.message))
     }
   }
 

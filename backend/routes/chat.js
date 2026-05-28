@@ -9,10 +9,32 @@ router.post('/start', async (req, res) => {
   try {
     const { visitorName, visitorEmail, visitorPhone, subject, category, createdBy } = req.body;
 
-    if (!visitorName || !visitorEmail || !subject || !createdBy) {
+    // Validate required fields
+    if (!visitorName) {
       return res.status(400).json({
         success: false,
-        message: 'Missing required fields'
+        message: 'Visitor name is required'
+      });
+    }
+
+    if (!visitorEmail) {
+      return res.status(400).json({
+        success: false,
+        message: 'Visitor email is required'
+      });
+    }
+
+    if (!subject) {
+      return res.status(400).json({
+        success: false,
+        message: 'Subject is required'
+      });
+    }
+
+    if (!createdBy) {
+      return res.status(400).json({
+        success: false,
+        message: 'User ID (createdBy) is required'
       });
     }
 
@@ -20,7 +42,7 @@ router.post('/start', async (req, res) => {
     if (!createdBy.match(/^[0-9a-fA-F]{24}$/)) {
       return res.status(400).json({
         success: false,
-        message: 'Invalid user ID format'
+        message: 'Invalid user ID format. Must be a valid MongoDB ObjectId.'
       });
     }
 
@@ -61,7 +83,8 @@ router.post('/start', async (req, res) => {
     console.error('Error starting conversation:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to start conversation'
+      message: 'Failed to start conversation',
+      error: error.message
     });
   }
 });
