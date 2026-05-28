@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/router'
 import api from '@/lib/api'
 import { motion } from 'framer-motion'
 import {
@@ -23,6 +24,8 @@ const INPUT_CLS = "admin-input"
 const LABEL_CLS = "block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2"
 
 function ChatContent() {
+  const router = useRouter()
+  const { conversationId } = router.query
   const [conversations, setConversations] = useState([])
   const [selectedConversation, setSelectedConversation] = useState(null)
   const [loading, setLoading] = useState(false)
@@ -39,9 +42,25 @@ function ChatContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const loadConversation = async (convId) => {
+    try {
+      const { data } = await api.get(`/chat/${convId}`, { headers: headers() })
+      setSelectedConversation(data.conversation)
+    } catch (error) {
+      console.error('Error loading conversation:', error)
+    }
+  }
+
   useEffect(() => {
     scrollToBottom()
   }, [selectedConversation?.messages])
+
+  useEffect(() => {
+    // If conversationId is provided in query, load that conversation
+    if (conversationId) {
+      loadConversation(conversationId)
+    }
+  }, [conversationId])
 
   const fetchConversations = async () => {
     try {

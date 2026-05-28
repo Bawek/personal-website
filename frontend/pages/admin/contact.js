@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import api from '@/lib/api'
 import { motion } from 'framer-motion'
-import { HiCheckCircle, HiXCircle, HiTrash, HiCheck, HiMail, HiPencil, HiPlus, HiSearch, HiFilter, HiDownload } from 'react-icons/hi'
+import { HiCheckCircle, HiXCircle, HiTrash, HiCheck, HiMail, HiPencil, HiPlus, HiSearch, HiFilter, HiDownload, HiChat } from 'react-icons/hi'
 import AdminLayout from '@/components/AdminLayout'
 import AuthProtection from '@/components/AuthProtection'
 
@@ -9,6 +10,7 @@ const INPUT_CLS = "admin-input"
 const LABEL_CLS = "block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2"
 
 function ContactContent() {
+  const router = useRouter()
   const [messages, setMessages] = useState([])
   const [filteredMessages, setFilteredMessages] = useState([])
   const [editingContact, setEditingContact] = useState(false)
@@ -26,6 +28,25 @@ function ContactContent() {
   })
 
   const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` })
+
+  const startChat = async (message) => {
+    try {
+      // Start a new conversation with the message sender
+      const { data } = await api.post('/chat/start', {
+        visitorName: message.name,
+        visitorEmail: message.email,
+        subject: message.subject || 'Follow-up to contact form',
+        category: 'support',
+        createdBy: localStorage.getItem('userId') || 'default'
+      }, { headers: headers() })
+
+      // Navigate to chat page with the conversation ID
+      router.push(`/admin/chat?conversationId=${data.conversation._id}`)
+    } catch (error) {
+      console.error('Error starting chat:', error)
+      alert('Failed to start chat')
+    }
+  }
 
   const fetchMessages = async () => {
     try { 
@@ -518,6 +539,9 @@ function ContactContent() {
                   <p className="text-xs text-gray-600 mt-2 font-mono">{new Date(msg.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="flex gap-1.5 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button onClick={() => startChat(msg)} className="p-1.5 rounded-lg text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 transition-all" aria-label="Start chat">
+                    <HiChat size={14} />
+                  </button>
                   {!msg.read && (
                     <button onClick={() => markRead(msg._id)} className="p-1.5 rounded-lg text-gray-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all" aria-label="Mark as read">
                       <HiCheck size={14} />
