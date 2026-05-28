@@ -1,5 +1,6 @@
 import '@/styles/globals.css'
 import { useState, useEffect } from 'react'
+import { useRouter } from 'next/router'
 import { LanguageProvider } from '@/lib/LanguageContext'
 import { ThemeProvider } from '@/lib/ThemeContext'
 import BackToTop from '@/components/BackToTop/BackToTop'
@@ -8,6 +9,7 @@ import Head from 'next/head'
 import { settingsAPI } from '@/lib/api'
 
 export default function App({ Component, pageProps }) {
+  const router = useRouter()
   const [footerData, setFooterData] = useState(null)
   const [settings, setSettings] = useState(null)
 
@@ -27,6 +29,9 @@ export default function App({ Component, pageProps }) {
     fetchSettings()
   }, [])
 
+  // Don't show footer on admin pages
+  const isAdminPage = router.pathname.startsWith('/admin')
+
   return (
     <ThemeProvider>
       <LanguageProvider>
@@ -41,8 +46,7 @@ export default function App({ Component, pageProps }) {
         </a>
         <Component {...pageProps} />
         <BackToTop />
-        <h1>footer page</h1>
-        <Footer footerData={footerData} settings={settings} />
+        {!isAdminPage && <Footer footerData={footerData} settings={settings} />}
       </LanguageProvider>
     </ThemeProvider>
   )
