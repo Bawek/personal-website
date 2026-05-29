@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { FaGithub, FaLinkedinIn, FaTwitter, FaEnvelope, FaArrowRight } from 'react-icons/fa'
 import { HiCheckCircle, HiXCircle } from 'react-icons/hi'
@@ -20,6 +20,20 @@ export default function Contact({ content, settings }) {
   const [form, setForm] = useState(INITIAL_FORM)
   const [status, setStatus] = useState(null)
   const [loading, setLoading] = useState(false)
+  const [adminUserId, setAdminUserId] = useState(null)
+
+  // Fetch admin user ID for chat
+  useEffect(() => {
+    const fetchAdminId = async () => {
+      try {
+        const { data } = await contactAPI.getDefaultAdmin()
+        setAdminUserId(data.adminId)
+      } catch (error) {
+        console.error('Error fetching admin ID:', error)
+      }
+    }
+    fetchAdminId()
+  }, [])
 
   const handleChange = (e) => setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }))
 
@@ -288,7 +302,7 @@ export default function Contact({ content, settings }) {
       </div>
 
       {/* Chat Widget */}
-      {isChatEnabled && <ChatWidget userId={settings?.createdBy || settings?._id} chatSettings={chatSettings} />}
+      {isChatEnabled && adminUserId && <ChatWidget userId={adminUserId} chatSettings={chatSettings} />}
     </section>
   )
 }

@@ -122,6 +122,7 @@ export const contactAPI = {
   sendMessage: (messageData) => api.post("/contact/messages", messageData),
   markMessageAsRead: (id) => api.patch(`/contact/messages/${id}/read`),
   deleteMessage: (id) => api.delete(`/contact/messages/${id}`),
+  getDefaultAdmin: () => api.get("/users/default-admin"),
 };
 
 export default api;

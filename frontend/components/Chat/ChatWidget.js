@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
+import { useRouter } from 'next/router'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HiX, HiPaperAirplane, HiChat } from 'react-icons/hi'
 import api from '@/lib/api'
 
 export default function ChatWidget({ userId, chatSettings }) {
+  const router = useRouter()
   const [isOpen, setIsOpen] = useState(false)
   const [conversation, setConversation] = useState(null)
   const [messages, setMessages] = useState([])
@@ -64,9 +66,8 @@ export default function ChatWidget({ userId, chatSettings }) {
 
       const { data } = await api.post('/chat/start', payload)
 
-      setConversation(data.conversation)
-      setMessages(data.conversation.messages || [])
-      setFormStep('chat')
+      // Redirect to public chat page
+      router.push(`/chat/${data.conversation._id}`)
     } catch (error) {
       console.error('Error starting chat:', error)
       console.error('Error response:', error.response?.data)
@@ -203,7 +204,7 @@ export default function ChatWidget({ userId, chatSettings }) {
                       required
                       value={visitorInfo.name}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                       placeholder="John Doe"
                     />
                   </div>
@@ -217,7 +218,7 @@ export default function ChatWidget({ userId, chatSettings }) {
                       required
                       value={visitorInfo.email}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, email: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                       placeholder="john@example.com"
                     />
                   </div>
@@ -230,7 +231,7 @@ export default function ChatWidget({ userId, chatSettings }) {
                       type="tel"
                       value={visitorInfo.phone}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                       placeholder="+1 (555) 000-0000"
                     />
                   </div>
@@ -244,7 +245,7 @@ export default function ChatWidget({ userId, chatSettings }) {
                       required
                       value={visitorInfo.subject}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, subject: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                       placeholder="What is this about?"
                     />
                   </div>
@@ -256,7 +257,7 @@ export default function ChatWidget({ userId, chatSettings }) {
                     <select
                       value={visitorInfo.category}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                     >
                       <option value="inquiry">General Inquiry</option>
                       <option value="support">Support</option>
@@ -316,7 +317,7 @@ export default function ChatWidget({ userId, chatSettings }) {
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
                     placeholder={settings.placeholder}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
                     disabled={loading}
                   />
                   <button

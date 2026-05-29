@@ -5,6 +5,33 @@ const { authenticate, authorize } = require('../middleware/auth');
 
 const router = express.Router();
 
+// GET /api/users/default-admin - Get default admin user ID (public endpoint for chat)
+router.get('/default-admin', async (req, res) => {
+  try {
+    // Find the first admin user
+    const admin = await User.findOne({ role: 'admin', isActive: true }).select('_id username');
+    
+    if (!admin) {
+      return res.status(404).json({
+        success: false,
+        message: 'No admin user found'
+      });
+    }
+
+    res.json({
+      success: true,
+      adminId: admin._id,
+      username: admin.username
+    });
+  } catch (error) {
+    console.error('Error fetching default admin:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch admin user'
+    });
+  }
+});
+
 // Get all users (admin only)
 router.get('/', authenticate, authorize('admin'), async (req, res) => {
   try {

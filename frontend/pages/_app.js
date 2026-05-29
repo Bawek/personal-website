@@ -36,9 +36,11 @@ export default function App({ Component, pageProps }) {
     <ThemeProvider>
       <LanguageProvider>
         <Head>
-          <link rel="icon" href="/favicon.ico" type="image/x-icon" />
-          <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
-          <link rel="apple-touch-icon" href="/favicon.ico" />
+          <link rel="icon" href="/favicon.ico" />
+          <link rel="shortcut icon" href="/favicon.ico" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/favicon.ico" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon.ico" />
+          <link rel="icon" type="image/png" sizes="16x16" href="/favicon.ico" />
           <meta name="theme-color" content="#1a1a2e" />
         </Head>
         <a href="#main-content" className="skip-link">

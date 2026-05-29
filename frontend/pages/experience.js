@@ -52,7 +52,6 @@ export default function ExperiencePage() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta property="og:title" content={siteTitle} />
         <meta property="og:description" content={siteDescription} />
-        {settings?.favicon && <link rel="icon" href={settings.favicon} />}
       </Head>
 
       <Navbar />
