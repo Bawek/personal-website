@@ -25,6 +25,9 @@ export default function PublicChatPage() {
 
   useEffect(() => {
     if (conversationId) {
+      // Save conversation ID to localStorage for persistence
+      localStorage.setItem('chatConversationId', conversationId)
+      
       loadConversation()
       // Poll for new messages every 5 seconds
       const interval = setInterval(loadConversation, 5000)
@@ -130,12 +133,24 @@ export default function PublicChatPage() {
                 Status: <span className="capitalize">{conversation.status}</span>
               </p>
             </div>
-            <button
-              onClick={() => router.push('/contact')}
-              className="p-2 hover:bg-white/20 rounded-lg transition"
-            >
-              <HiX className="w-6 h-6" />
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  localStorage.removeItem('chatConversationId')
+                  localStorage.removeItem('chatVisitorInfo')
+                  router.push('/contact')
+                }}
+                className="px-4 py-2 bg-white/20 hover:bg-white/30 rounded-lg transition text-sm font-medium"
+              >
+                New Chat
+              </button>
+              <button
+                onClick={() => router.push('/contact')}
+                className="p-2 hover:bg-white/20 rounded-lg transition"
+              >
+                <HiX className="w-6 h-6" />
+              </button>
+            </div>
           </div>
         </div>
 

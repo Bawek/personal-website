@@ -31,6 +31,30 @@ export default function ChatWidget({ userId, chatSettings }) {
     socialLinks: []
   }
 
+  // Load saved conversation from localStorage
+  useEffect(() => {
+    const savedConversationId = localStorage.getItem('chatConversationId')
+    const savedVisitorInfo = localStorage.getItem('chatVisitorInfo')
+    
+    if (savedConversationId && savedVisitorInfo) {
+      // Load existing conversation
+      setConversation({ _id: savedConversationId })
+      setVisitorInfo(JSON.parse(savedVisitorInfo))
+      setFormStep('chat')
+      
+      // Load messages
+      const loadMessages = async () => {
+        try {
+          const { data } = await api.get(`/chat/${savedConversationId}`)
+          setMessages(data.messages || [])
+        } catch (error) {
+          console.error('Error loading messages:', error)
+        }
+      }
+      loadMessages()
+    }
+  }, [])
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
@@ -66,8 +90,14 @@ export default function ChatWidget({ userId, chatSettings }) {
 
       const { data } = await api.post('/chat/start', payload)
 
-      // Redirect to public chat page
-      router.push(`/chat/${data.conversation._id}`)
+      // Save conversation ID to localStorage
+      localStorage.setItem('chatConversationId', data.conversation._id)
+      localStorage.setItem('chatVisitorInfo', JSON.stringify(visitorInfo))
+
+      // Set conversation and switch to chat view
+      setConversation(data.conversation)
+      setMessages(data.conversation.messages || [])
+      setFormStep('chat')
     } catch (error) {
       console.error('Error starting chat:', error)
       console.error('Error response:', error.response?.data)
@@ -123,15 +153,25 @@ export default function ChatWidget({ userId, chatSettings }) {
         <HiChat className="w-6 h-6" />
       </motion.button>
 
-      {/* Chat Window */}
+      {/* Chat Window - Full Screen Dialog */}
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-24 right-6 w-96 max-w-[calc(100vw-24px)] bg-white rounded-2xl shadow-2xl flex flex-col z-50 h-[600px]"
-          >
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/20 backdrop-blur-sm z-50"
+            />
+            
+            {/* Chat Dialog - Bottom Right */}
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.95 }}
+              className="fixed bottom-24 right-6 w-[400px] h-[600px] bg-white rounded-2xl shadow-2xl flex flex-col z-50"
+            >
             {/* Header */}
             <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white p-4 rounded-t-2xl flex justify-between items-center">
               <div>
@@ -154,8 +194,8 @@ export default function ChatWidget({ userId, chatSettings }) {
                   animate={{ opacity: 1 }}
                   className="space-y-4"
                 >
-                  <div className="bg-white p-4 rounded-lg border border-gray-200">
-                    <p className="text-gray-700 mb-4">
+                  <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                    <p className="text-gray-700 mb-4 text-sm">
                       {settings.initialMessage}
                     </p>
                     <button
@@ -168,7 +208,7 @@ export default function ChatWidget({ userId, chatSettings }) {
 
                   {/* Social Links */}
                   {settings.socialLinks && settings.socialLinks.length > 0 && (
-                    <div className="bg-white p-4 rounded-lg border border-gray-200 space-y-2">
+                    <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm space-y-2">
                       <p className="text-xs font-semibold text-gray-600 uppercase tracking-widest">Connect with us</p>
                       <div className="flex flex-wrap gap-2">
                         {settings.socialLinks.map((link) => (
@@ -177,7 +217,7 @@ export default function ChatWidget({ userId, chatSettings }) {
                             href={link.url}
                             target="_blank"
                             rel="noreferrer"
-                            className="px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-sm rounded-full transition border border-blue-200"
+                            className="px-3 py-1 bg-blue-50 hover:bg-blue-100 text-blue-600 text-xs rounded-full transition border border-blue-200"
                           >
                             {link.platform}
                           </a>
@@ -196,7 +236,7 @@ export default function ChatWidget({ userId, chatSettings }) {
                   className="space-y-3"
                 >
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Your Name *
                     </label>
                     <input
@@ -204,13 +244,13 @@ export default function ChatWidget({ userId, chatSettings }) {
                       required
                       value={visitorInfo.name}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, name: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                       placeholder="John Doe"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Email *
                     </label>
                     <input
@@ -218,26 +258,26 @@ export default function ChatWidget({ userId, chatSettings }) {
                       required
                       value={visitorInfo.email}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, email: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                       placeholder="john@example.com"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Phone
                     </label>
                     <input
                       type="tel"
                       value={visitorInfo.phone}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, phone: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                       placeholder="+1 (555) 000-0000"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Subject *
                     </label>
                     <input
@@ -245,19 +285,19 @@ export default function ChatWidget({ userId, chatSettings }) {
                       required
                       value={visitorInfo.subject}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, subject: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                       placeholder="What is this about?"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 mb-1">
                       Category
                     </label>
                     <select
                       value={visitorInfo.category}
                       onChange={(e) => setVisitorInfo({ ...visitorInfo, category: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
                     >
                       <option value="inquiry">General Inquiry</option>
                       <option value="support">Support</option>
@@ -278,59 +318,60 @@ export default function ChatWidget({ userId, chatSettings }) {
               )}
 
               {formStep === 'chat' && (
-                <div className="space-y-3">
-                  {messages.map((msg, idx) => (
-                    <motion.div
-                      key={idx}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${msg.sender === 'visitor' ? 'justify-end' : 'justify-start'}`}
-                    >
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="flex flex-col h-full"
+                >
+                  {/* Messages */}
+                  <div className="flex-1 overflow-y-auto space-y-3 mb-4">
+                    {messages.map((msg, idx) => (
                       <div
-                        className={`max-w-xs px-4 py-2 rounded-lg ${
-                          msg.sender === 'visitor'
-                            ? 'bg-blue-500 text-white rounded-br-none'
-                            : 'bg-gray-200 text-gray-900 rounded-bl-none'
-                        }`}
+                        key={idx}
+                        className={`flex ${msg.sender === 'visitor' ? 'justify-end' : 'justify-start'}`}
                       >
-                        <p className="text-sm">{msg.content}</p>
-                        <p className="text-xs mt-1 opacity-70">
-                          {new Date(msg.createdAt).toLocaleTimeString([], {
-                            hour: '2-digit',
-                            minute: '2-digit'
-                          })}
-                        </p>
+                        <div
+                          className={`max-w-[80%] px-3 py-2 rounded-lg text-sm ${
+                            msg.sender === 'visitor'
+                              ? 'bg-blue-500 text-white'
+                              : 'bg-gray-200 text-gray-900'
+                          }`}
+                        >
+                          <p>{msg.content}</p>
+                          <p className="text-xs opacity-70 mt-1">
+                            {new Date(msg.createdAt).toLocaleTimeString([], {
+                              hour: '2-digit',
+                              minute: '2-digit'
+                            })}
+                          </p>
+                        </div>
                       </div>
-                    </motion.div>
-                  ))}
-                  <div ref={messagesEndRef} />
-                </div>
+                    ))}
+                    <div ref={messagesEndRef} />
+                  </div>
+
+                  {/* Input */}
+                  <form onSubmit={handleSendMessage} className="flex gap-2">
+                    <input
+                      type="text"
+                      value={inputValue}
+                      onChange={(e) => setInputValue(e.target.value)}
+                      placeholder={settings.placeholder}
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900 text-sm"
+                    />
+                    <button
+                      type="submit"
+                      disabled={loading || !inputValue.trim()}
+                      className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white p-2 rounded-lg transition"
+                    >
+                      <HiPaperAirplane className="w-5 h-5" />
+                    </button>
+                  </form>
+                </motion.div>
               )}
             </div>
-
-            {/* Input */}
-            {formStep === 'chat' && (
-              <form onSubmit={handleSendMessage} className="border-t border-gray-200 p-4 bg-white rounded-b-2xl">
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    placeholder={settings.placeholder}
-                    className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white text-gray-900"
-                    disabled={loading}
-                  />
-                  <button
-                    type="submit"
-                    disabled={loading || !inputValue.trim()}
-                    className="bg-blue-500 hover:bg-blue-600 disabled:bg-gray-400 text-white p-2 rounded-lg transition"
-                  >
-                    <HiPaperAirplane className="w-5 h-5" />
-                  </button>
-                </div>
-              </form>
-            )}
           </motion.div>
+          </>
         )}
       </AnimatePresence>
     </>
