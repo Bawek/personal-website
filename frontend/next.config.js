@@ -1,21 +1,45 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
+  
   images: {
-    // unoptimized: true keeps Firebase hosting happy (no server-side image optimization)
-    unoptimized: true,
-    domains: [
-      'localhost',
-      'avatars.githubusercontent.com',  // GitHub user avatars (sync service)
-      'raw.githubusercontent.com',       // GitHub raw content
-      'github.com',
-      'res.cloudinary.com',              // Cloudinary (if used for uploads)
-      'images.unsplash.com',             // Unsplash
-      'lh3.googleusercontent.com',       // Google profile pictures
-      'personal-website-lrjc.onrender.com' // ✅ ADD THIS
-
+    // Use Next.js image optimization on Vercel
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'raw.githubusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'github.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.vercel-storage.com',
+      },
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+      },
     ],
   },
+
   async redirects() {
     return [
       { source: '/expenso', destination: '/projects', permanent: true },
@@ -23,20 +47,20 @@ const nextConfig = {
       { source: '/mailbox-client', destination: '/projects', permanent: true },
     ];
   },
-  async rewrites() {
-    // In development, proxy /api/* and /uploads/* to the Express backend.
-    // In production (Firebase hosting), these are handled by firebase.json rewrites
-    // pointing to your deployed backend URL.
-    if (process.env.NODE_ENV === 'production') return [];
 
+  // API routes are now handled by Next.js - no rewrites needed!
+  
+  // Security headers
+  async headers() {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://localhost:5000/api/:path*',
-      },
-      {
-        source: '/uploads/:path*',
-        destination: 'http://localhost:5000/uploads/:path*',
+        headers: [
+          { key: 'Access-Control-Allow-Credentials', value: 'true' },
+          { key: 'Access-Control-Allow-Origin', value: process.env.NEXT_PUBLIC_BASE_URL || '*' },
+          { key: 'Access-Control-Allow-Methods', value: 'GET,DELETE,PATCH,POST,PUT' },
+          { key: 'Access-Control-Allow-Headers', value: 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization' },
+        ],
       },
     ];
   },
