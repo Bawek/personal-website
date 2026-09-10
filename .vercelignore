@@ -1,8 +1,0 @@
-backend
-.git
-.kiro
-node_modules
-.env
-.env.local
-.env.*.local
-*.md
