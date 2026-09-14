@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import api from '@/lib/api'
 import { motion } from 'framer-motion'
-import { HiPencil, HiTrash, HiStar, HiPlus, HiX, HiExternalLink, HiSearch, HiFilter, HiCheck } from 'react-icons/hi'
+import { HiPencil, HiTrash, HiStar, HiPlus, HiX, HiExternalLink, HiSearch, HiFilter, HiCheck, HiUpload, HiPhotograph } from 'react-icons/hi'
 import { FaGithub } from 'react-icons/fa'
 import AdminLayout from '@/components/AdminLayout'
 import AuthProtection from '@/components/AuthProtection'
 import Link from 'next/link'
+import { getImageFromPasteEvent, validateImageFile, filePreviewUrl, uploadImageFile } from '@/lib/imageUpload'
 
 const INIT = { title: '', description: '', techStack: '', liveUrl: '', githubUrl: '', imageUrl: '', featured: false }
 
@@ -23,8 +24,207 @@ function ProjectsContent() {
   const [searchQuery, setSearchQuery] = useState('')
   const [filterFeatured, setFilterFeatured] = useState('all')
   const [selectedIds, setSelectedIds] = useState([])
+  const [imageInputMode, setImageInputMode] = useState('url') // 'url' or 'upload'
+  const [imageFile, setImageFile] = useState(null)
+  const [imagePreview, setImagePreview] = useState('')
+  const [uploadingImage, setUploadingImage] = useState(false)
+  const [imageError, setImageError] = useState('')
+  const fileInputRef = useRef(null)
 
   const headers = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` })
+
+  const handleImagePaste = (e) => {
+    if (imageInputMode !== 'upload') return
+    const file = getImageFromPasteEvent(e)
+    if (file) {
+      e.preventDefault()
+      handleImageFileSelect(file)
+    }
+  }
+
+  const handleImageFileSelect = async (file) => {
+    console.log('=== handleImageFileSelect called ===')
+    console.log('File received:', file)
+    console.log('File name:', file?.name)
+    console.log('File size:', file?.size)
+    console.log('File type:', file?.type)
+    
+    const validationError = validateImageFile(file)
+    console.log('Validation result:', validationError)
+    
+    if (validationError) {
+      console.log('Validation failed:', validationError)
+      setImageError(validationError)
+      return
+    }
+    
+    console.log('Validation passed, setting file and preview')
+    setImageError('')
+    setImageFile(file)
+    
+    // Use async function to get data URL
+    const previewUrl = await filePreviewUrl(file)
+    console.log('Preview URL generated:', previewUrl)
+    setImagePreview(previewUrl)
+    
+    console.log('File and preview set successfully')
+  }
+
+  const handleImageUpload = async () => {
+    console.log('=== handleImageUpload called ===')
+    console.log('Image file:', imageFile)
+    console.log('Image file name:', imageFile?.name)
+    console.log('Image file size:', imageFile?.size)
+    
+    if (!imageFile) {
+      console.log('No image file, returning')
+      return
+    }
+    
+    try {
+      console.log('Setting uploading state to true')
+      setUploadingImage(true)
+      setImageError('')
+      
+      console.log('Starting image upload:', imageFile.name, imageFile.size)
+      
+      // Direct Cloudinary upload approach
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dnduqbk4q'
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'preset_unsigned'
+      
+      console.log('Environment variables check:')
+      console.log('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME)
+      console.log('NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET)
+      console.log('Using config:', { cloudName, uploadPreset })
+      
+      const formData = new FormData()
+      
+      // Convert file to base64 for Cloudinary upload
+      const reader = new FileReader()
+      const base64Promise = new Promise((resolve, reject) => {
+        reader.onload = () => resolve(reader.result)
+        reader.onerror = reject
+        reader.readAsDataURL(imageFile)
+      })
+      
+      const base64Data = await base64Promise
+      console.log('File converted to base64, length:', base64Data.length)
+      
+      formData.append('file', base64Data)
+      formData.append('upload_preset', uploadPreset)
+      formData.append('folder', 'projects')
+      
+      console.log('FormData created with:', {
+        fileName: imageFile.name,
+        fileSize: imageFile.size,
+        uploadPreset: uploadPreset,
+        folder: 'projects',
+        dataLength: base64Data.length
+      })
+      
+      const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
+      console.log('Cloudinary URL:', cloudinaryUrl)
+      
+      console.log('Starting fetch request...')
+      const response = await fetch(cloudinaryUrl, {
+        method: 'POST',
+        body: formData,
+      })
+      
+      console.log('Fetch response received:', response.status, response.statusText)
+      
+      const result = await response.json()
+      console.log('Cloudinary response JSON:', result)
+      
+      if (!response.ok) {
+        console.log('Response not OK, throwing error')
+        throw new Error(result.error?.message || result.message || 'Upload failed')
+      }
+      
+      const uploadedUrl = result.secure_url
+      console.log('Upload successful! URL:', uploadedUrl)
+      
+      console.log('Updating form with image URL')
+      setForm({ ...form, imageUrl: uploadedUrl })
+      setImageFile(null)
+      setImagePreview('')
+      
+      console.log('Upload process completed successfully')
+      
+    } catch (err) {
+      console.error('=== Upload Error ===')
+      console.error('Error message:', err.message)
+      console.error('Error stack:', err.stack)
+      console.error('Full error:', err)
+      setImageError(err.message || 'Failed to upload image')
+    } finally {
+      console.log('Setting uploading state to false')
+      setUploadingImage(false)
+    }
+  }
+
+  const handleFileInputChange = (e) => {
+    console.log('File input change event:', e)
+    console.log('Files:', e.target.files)
+    const file = e.target.files[0]
+    console.log('Selected file:', file)
+    if (file) {
+      console.log('Processing file:', file.name, file.size, file.type)
+      handleImageFileSelect(file)
+    } else {
+      console.log('No file selected')
+    }
+  }
+
+  const clearImagePreview = () => {
+    console.log('Clearing image preview')
+    setImageFile(null)
+    setImagePreview('')
+    setImageError('')
+    if (fileInputRef.current) fileInputRef.current.value = ''
+  }
+
+  // Test Cloudinary connection
+  const testCloudinaryConnection = async () => {
+    console.log('=== Testing Cloudinary Connection ===')
+    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dnduqbk4q'
+    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'preset_unsigned'
+    
+    console.log('Configuration:', { cloudName, uploadPreset })
+    
+    // Test with a simple base64 image (1x1 pixel)
+    const testImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+    
+    const formData = new FormData()
+    formData.append('file', testImage)
+    formData.append('upload_preset', uploadPreset)
+    formData.append('folder', 'test')
+    
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
+    console.log('Test URL:', cloudinaryUrl)
+    
+    try {
+      const response = await fetch(cloudinaryUrl, {
+        method: 'POST',
+        body: formData,
+      })
+      
+      const result = await response.json()
+      console.log('Test Result:', result)
+      
+      if (response.ok) {
+        console.log('✅ Cloudinary connection successful!')
+        console.log('Test image URL:', result.secure_url)
+        alert('Cloudinary connection successful! Check console for details.')
+      } else {
+        console.log('❌ Cloudinary connection failed:', result)
+        alert('Cloudinary connection failed: ' + (result.error?.message || result.message || 'Unknown error'))
+      }
+    } catch (error) {
+      console.error('Test Error:', error)
+      alert('Test error: ' + error.message)
+    }
+  }
 
   const fetchProjects = async () => {
     try {
@@ -62,12 +262,42 @@ function ProjectsContent() {
     setFilteredProjects(filtered)
   }, [searchQuery, filterFeatured, projects])
 
-  const openNew = () => { setForm(INIT); setEditing(null); setShowForm(true); setError('') }
-  const openEdit = (p) => {
-    setForm({ title: p.title, description: p.description, techStack: (p.techStack || []).join(', '), liveUrl: p.liveUrl || '', githubUrl: p.githubUrl || '', imageUrl: p.imageUrl || '', featured: p.featured || false })
-    setEditing(p); setShowForm(true); setError('')
+  const openNew = () => {
+    setForm(INIT)
+    setEditing(null)
+    setShowForm(true)
+    setError('')
+    setImageInputMode('url')
+    setImageFile(null)
+    setImagePreview('')
+    setImageError('')
   }
-  const closeForm = () => { setShowForm(false); setEditing(null); setForm(INIT) }
+  const openEdit = (p) => {
+    setForm({
+      title: p.title,
+      description: p.description,
+      techStack: (p.techStack || []).join(', '),
+      liveUrl: p.liveUrl || '',
+      githubUrl: p.githubUrl || '',
+      imageUrl: p.imageUrl || '',
+      featured: p.featured || false
+    })
+    setEditing(p)
+    setShowForm(true)
+    setError('')
+    setImageInputMode('url')
+    setImageFile(null)
+    setImagePreview('')
+    setImageError('')
+  }
+  const closeForm = () => {
+    setShowForm(false)
+    setEditing(null)
+    setForm(INIT)
+    setImageFile(null)
+    setImagePreview('')
+    setImageError('')
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault(); setSaving(true); setError('')
@@ -244,8 +474,164 @@ function ProjectsContent() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Image URL</label>
-              <input type="url" value={form.imageUrl} onChange={e => setForm({ ...form, imageUrl: e.target.value })} placeholder="https://…" className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm" />
+              <label className="block text-xs font-mono text-gray-400 uppercase tracking-widest mb-2">Project Image</label>
+              
+              {/* Input Mode Toggle */}
+              <div className="flex gap-2 mb-3">
+                <button
+                  type="button"
+                  onClick={() => setImageInputMode('url')}
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    imageInputMode === 'url'
+                      ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                      : 'bg-white/5 text-gray-400 border border-white/10 hover:border-white/20'
+                  }`}
+                >
+                  URL
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setImageInputMode('upload')}
+                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
+                    imageInputMode === 'upload'
+                      ? 'bg-violet-500/20 text-violet-300 border border-violet-500/30'
+                      : 'bg-white/5 text-gray-400 border border-white/10 hover:border-white/20'
+                  }`}
+                >
+                  Upload
+                </button>
+              </div>
+
+              {/* URL Input Mode */}
+              {imageInputMode === 'url' && (
+                <div className="relative">
+                  <input
+                    type="url"
+                    value={form.imageUrl}
+                    onChange={e => setForm({ ...form, imageUrl: e.target.value })}
+                    placeholder="https://example.com/image.jpg"
+                    className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm pr-10"
+                  />
+                  {form.imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => setForm({ ...form, imageUrl: '' })}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white"
+                    >
+                      <HiX size={14} />
+                    </button>
+                  )}
+                </div>
+              )}
+
+              {/* Upload Mode */}
+              {imageInputMode === 'upload' && (
+                <div className="space-y-3">
+                  <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3 text-center">
+                    <p className="text-xs text-blue-300 font-medium">⚠️ Select an image, then click "Upload Image to Cloudinary" button below</p>
+                  </div>
+                  
+                  <div
+                    className="border-2 border-dashed border-white/10 rounded-lg p-4 text-center hover:border-violet-500/30 transition-colors cursor-pointer"
+                    onClick={() => {
+                      console.log('Upload area clicked, triggering file input')
+                      fileInputRef.current?.click()
+                    }}
+                    onPaste={handleImagePaste}
+                  >
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        console.log('File input changed:', e.target.files)
+                        handleFileInputChange(e)
+                      }}
+                      className="hidden"
+                    />
+                    <HiPhotograph size={24} className="mx-auto text-gray-500 mb-2" />
+                    <p className="text-sm text-gray-400 mb-1">
+                      {imageFile ? imageFile.name : 'Click to upload or paste image'}
+                    </p>
+                    <p className="text-xs text-gray-600">Supports JPG, PNG, GIF (max 5MB)</p>
+                  </div>
+
+                  {/* Image Preview */}
+                  {imagePreview && (
+                    <div className="relative rounded-lg overflow-hidden border border-white/10">
+                      <img src={imagePreview} alt="Preview" className="w-full h-32 object-cover" />
+                      <button
+                        type="button"
+                        onClick={clearImagePreview}
+                        className="absolute top-2 right-2 bg-black/50 hover:bg-black/70 text-white rounded-full p-1 transition-colors"
+                      >
+                        <HiX size={14} />
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Upload Button */}
+                  {imageFile && (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault()
+                        e.stopPropagation()
+                        console.log('=== UPLOAD IMAGE BUTTON CLICKED ===')
+                        console.log('Click event:', e)
+                        console.log('Current form state:', form)
+                        console.log('Current image file:', imageFile)
+                        console.log('Image file details:', {
+                          name: imageFile.name,
+                          size: imageFile.size,
+                          type: imageFile.type
+                        })
+                        console.log('Environment check:', {
+                          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+                          NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
+                        })
+                        console.log('Calling handleImageUpload...')
+                        handleImageUpload()
+                      }}
+                      disabled={uploadingImage}
+                      className="w-full flex items-center justify-center gap-2 px-4 py-3 rounded-lg bg-gradient-to-r from-violet-500 to-pink-500 text-white text-sm font-semibold hover:from-violet-400 hover:to-pink-400 transition-all disabled:opacity-50 shadow-lg shadow-violet-500/25"
+                    >
+                      {uploadingImage ? (
+                        <>
+                          <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          Uploading...
+                        </>
+                      ) : (
+                        <>
+                          <HiUpload size={16} />
+                          Upload Image to Cloudinary
+                        </>
+                      )}
+                    </button>
+                  )}
+
+                  {/* Upload Error */}
+                  {imageError && (
+                    <p className="text-xs text-red-400">{imageError}</p>
+                  )}
+
+                  {/* Test Cloudinary Connection */}
+                  <button
+                    type="button"
+                    onClick={testCloudinaryConnection}
+                    className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30 text-sm font-medium hover:bg-blue-500/30 transition-all"
+                  >
+                    Test Cloudinary Connection
+                  </button>
+
+                  {/* Uploaded URL Display */}
+                  {form.imageUrl && imageInputMode === 'upload' && (
+                    <div className="bg-green-500/10 border border-green-500/20 rounded-lg p-2">
+                      <p className="text-xs text-green-400 font-mono break-all">{form.imageUrl}</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={form.featured} onChange={e => setForm({ ...form, featured: e.target.checked })} className="w-4 h-4 rounded" />

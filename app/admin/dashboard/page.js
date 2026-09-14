@@ -60,8 +60,21 @@ function DashboardContent() {
       const skills      = sR.status === 'fulfilled' ? (Array.isArray(sR.value.data) ? sR.value.data : (sR.value.data.skills || [])) : []
       const experiences = eR.status === 'fulfilled' ? (Array.isArray(eR.value.data) ? eR.value.data : (eR.value.data.experience || [])) : []
       const users       = uR.status === 'fulfilled' ? (Array.isArray(uR.value.data) ? uR.value.data : []) : []
-      setStats({ totalProjects: projects.length, featuredProjects: projects.filter(p => p.featured).length, totalSkills: skills.length, totalExperience: experiences.length, totalUsers: users.length })
-      setRecent(projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5))
+      
+      // Ensure projects is an array before filtering
+      const projectsArray = Array.isArray(projects) ? projects : []
+      const skillsArray = Array.isArray(skills) ? skills : []
+      const experiencesArray = Array.isArray(experiences) ? experiences : []
+      const usersArray = Array.isArray(users) ? users : []
+      
+      setStats({ 
+        totalProjects: projectsArray.length, 
+        featuredProjects: projectsArray.filter(p => p.featured).length, 
+        totalSkills: skillsArray.length, 
+        totalExperience: experiencesArray.length, 
+        totalUsers: usersArray.length 
+      })
+      setRecent(projectsArray.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5))
       setLoading(false)
     }
     fetchData()

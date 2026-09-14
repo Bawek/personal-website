@@ -64,9 +64,11 @@ export default function FeaturedProjects({ projects }) {
 
                 {/* Content Section */}
                 <div className="p-6 flex-1 flex flex-col">
-                  <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-violet-400 transition-colors line-clamp-1">
-                    {project.title}
-                  </h3>
+                  <Link href={`/projects/${project.slug}`} className="block">
+                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-violet-400 transition-colors line-clamp-1">
+                      {project.title}
+                    </h3>
+                  </Link>
                   <p className="text-sm text-gray-400 mb-4 line-clamp-2 flex-1">{project.description}</p>
                   
                   {/* Tech Stack */}
