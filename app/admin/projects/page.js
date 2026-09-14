@@ -43,59 +43,31 @@ function ProjectsContent() {
   }
 
   const handleImageFileSelect = async (file) => {
-    console.log('=== handleImageFileSelect called ===')
-    console.log('File received:', file)
-    console.log('File name:', file?.name)
-    console.log('File size:', file?.size)
-    console.log('File type:', file?.type)
-    
     const validationError = validateImageFile(file)
-    console.log('Validation result:', validationError)
     
     if (validationError) {
-      console.log('Validation failed:', validationError)
       setImageError(validationError)
       return
     }
     
-    console.log('Validation passed, setting file and preview')
     setImageError('')
     setImageFile(file)
     
     // Use async function to get data URL
     const previewUrl = await filePreviewUrl(file)
-    console.log('Preview URL generated:', previewUrl)
     setImagePreview(previewUrl)
-    
-    console.log('File and preview set successfully')
   }
 
   const handleImageUpload = async () => {
-    console.log('=== handleImageUpload called ===')
-    console.log('Image file:', imageFile)
-    console.log('Image file name:', imageFile?.name)
-    console.log('Image file size:', imageFile?.size)
-    
-    if (!imageFile) {
-      console.log('No image file, returning')
-      return
-    }
+    if (!imageFile) return
     
     try {
-      console.log('Setting uploading state to true')
       setUploadingImage(true)
       setImageError('')
-      
-      console.log('Starting image upload:', imageFile.name, imageFile.size)
       
       // Direct Cloudinary upload approach
       const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dnduqbk4q'
       const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'preset_unsigned'
-      
-      console.log('Environment variables check:')
-      console.log('NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME:', process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME)
-      console.log('NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET:', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET)
-      console.log('Using config:', { cloudName, uploadPreset })
       
       const formData = new FormData()
       
@@ -108,76 +80,46 @@ function ProjectsContent() {
       })
       
       const base64Data = await base64Promise
-      console.log('File converted to base64, length:', base64Data.length)
       
       formData.append('file', base64Data)
       formData.append('upload_preset', uploadPreset)
       formData.append('folder', 'projects')
       
-      console.log('FormData created with:', {
-        fileName: imageFile.name,
-        fileSize: imageFile.size,
-        uploadPreset: uploadPreset,
-        folder: 'projects',
-        dataLength: base64Data.length
-      })
-      
       const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
-      console.log('Cloudinary URL:', cloudinaryUrl)
       
-      console.log('Starting fetch request...')
       const response = await fetch(cloudinaryUrl, {
         method: 'POST',
         body: formData,
       })
       
-      console.log('Fetch response received:', response.status, response.statusText)
-      
       const result = await response.json()
-      console.log('Cloudinary response JSON:', result)
       
       if (!response.ok) {
-        console.log('Response not OK, throwing error')
         throw new Error(result.error?.message || result.message || 'Upload failed')
       }
       
       const uploadedUrl = result.secure_url
-      console.log('Upload successful! URL:', uploadedUrl)
       
-      console.log('Updating form with image URL')
       setForm({ ...form, imageUrl: uploadedUrl })
       setImageFile(null)
       setImagePreview('')
       
-      console.log('Upload process completed successfully')
-      
     } catch (err) {
-      console.error('=== Upload Error ===')
-      console.error('Error message:', err.message)
-      console.error('Error stack:', err.stack)
-      console.error('Full error:', err)
+      console.error('Upload error:', err)
       setImageError(err.message || 'Failed to upload image')
     } finally {
-      console.log('Setting uploading state to false')
       setUploadingImage(false)
     }
   }
 
   const handleFileInputChange = (e) => {
-    console.log('File input change event:', e)
-    console.log('Files:', e.target.files)
     const file = e.target.files[0]
-    console.log('Selected file:', file)
     if (file) {
-      console.log('Processing file:', file.name, file.size, file.type)
       handleImageFileSelect(file)
-    } else {
-      console.log('No file selected')
     }
   }
 
   const clearImagePreview = () => {
-    console.log('Clearing image preview')
     setImageFile(null)
     setImagePreview('')
     setImageError('')
@@ -186,11 +128,8 @@ function ProjectsContent() {
 
   // Test Cloudinary connection
   const testCloudinaryConnection = async () => {
-    console.log('=== Testing Cloudinary Connection ===')
     const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'dnduqbk4q'
     const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'preset_unsigned'
-    
-    console.log('Configuration:', { cloudName, uploadPreset })
     
     // Test with a simple base64 image (1x1 pixel)
     const testImage = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
@@ -201,7 +140,6 @@ function ProjectsContent() {
     formData.append('folder', 'test')
     
     const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`
-    console.log('Test URL:', cloudinaryUrl)
     
     try {
       const response = await fetch(cloudinaryUrl, {
@@ -210,14 +148,10 @@ function ProjectsContent() {
       })
       
       const result = await response.json()
-      console.log('Test Result:', result)
       
       if (response.ok) {
-        console.log('✅ Cloudinary connection successful!')
-        console.log('Test image URL:', result.secure_url)
-        alert('Cloudinary connection successful! Check console for details.')
+        alert('Cloudinary connection successful! ✓')
       } else {
-        console.log('❌ Cloudinary connection failed:', result)
         alert('Cloudinary connection failed: ' + (result.error?.message || result.message || 'Unknown error'))
       }
     } catch (error) {
@@ -533,20 +467,14 @@ function ProjectsContent() {
                   
                   <div
                     className="border-2 border-dashed border-white/10 rounded-lg p-4 text-center hover:border-violet-500/30 transition-colors cursor-pointer"
-                    onClick={() => {
-                      console.log('Upload area clicked, triggering file input')
-                      fileInputRef.current?.click()
-                    }}
+                    onClick={() => fileInputRef.current?.click()}
                     onPaste={handleImagePaste}
                   >
                     <input
                       ref={fileInputRef}
                       type="file"
                       accept="image/*"
-                      onChange={(e) => {
-                        console.log('File input changed:', e.target.files)
-                        handleFileInputChange(e)
-                      }}
+                      onChange={handleFileInputChange}
                       className="hidden"
                     />
                     <HiPhotograph size={24} className="mx-auto text-gray-500 mb-2" />
@@ -577,20 +505,6 @@ function ProjectsContent() {
                       onClick={(e) => {
                         e.preventDefault()
                         e.stopPropagation()
-                        console.log('=== UPLOAD IMAGE BUTTON CLICKED ===')
-                        console.log('Click event:', e)
-                        console.log('Current form state:', form)
-                        console.log('Current image file:', imageFile)
-                        console.log('Image file details:', {
-                          name: imageFile.name,
-                          size: imageFile.size,
-                          type: imageFile.type
-                        })
-                        console.log('Environment check:', {
-                          NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-                          NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET: process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET
-                        })
-                        console.log('Calling handleImageUpload...')
                         handleImageUpload()
                       }}
                       disabled={uploadingImage}
@@ -614,15 +528,6 @@ function ProjectsContent() {
                   {imageError && (
                     <p className="text-xs text-red-400">{imageError}</p>
                   )}
-
-                  {/* Test Cloudinary Connection */}
-                  <button
-                    type="button"
-                    onClick={testCloudinaryConnection}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-500/30 text-sm font-medium hover:bg-blue-500/30 transition-all"
-                  >
-                    Test Cloudinary Connection
-                  </button>
 
                   {/* Uploaded URL Display */}
                   {form.imageUrl && imageInputMode === 'upload' && (

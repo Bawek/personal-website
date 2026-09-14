@@ -76,8 +76,6 @@ export async function POST(req) {
     formDataCloudinary.append('upload_preset', uploadPreset)
     formDataCloudinary.append('folder', folder)
 
-    console.log('Uploading to Cloudinary:', { cloudName, uploadPreset, folder })
-
     const response = await fetch(cloudinaryUrl, {
       method: 'POST',
       body: formDataCloudinary,
