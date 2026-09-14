@@ -82,7 +82,7 @@ export default function Navbar() {
             <a href="https://github.com/Bawek" target="_blank" rel="noreferrer" className="btn-icon" aria-label="GitHub">
               <FaGithub size={16} />
             </a>
-            <a href="https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/" target="_blank" rel="noreferrer" className="btn-icon" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/in/baweke/" target="_blank" rel="noreferrer" className="btn-icon" aria-label="LinkedIn">
               <FaLinkedinIn size={16} />
             </a>
             <Link href="/contact" className="btn-primary text-xs py-2 px-4">Hire Me</Link>
@@ -152,7 +152,7 @@ export default function Navbar() {
                   <a href="https://github.com/Bawek" target="_blank" rel="noreferrer" className="btn-icon" aria-label="GitHub">
                     <FaGithub size={16} />
                   </a>
-                  <a href="https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/" target="_blank" rel="noreferrer" className="btn-icon" aria-label="LinkedIn">
+                  <a href="https://www.linkedin.com/in/baweke/" target="_blank" rel="noreferrer" className="btn-icon" aria-label="LinkedIn">
                     <FaLinkedinIn size={16} />
                   </a>
                 </div>

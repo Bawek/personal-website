@@ -10,7 +10,7 @@ import Link from 'next/link'
 
 const SOCIAL_LINKS = [
   { href: 'https://github.com/Bawek', icon: FaGithub, label: 'GitHub' },
-  { href: 'https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/', icon: FaLinkedinIn, label: 'LinkedIn' },
+  { href: 'https://www.linkedin.com/in/baweke/', icon: FaLinkedinIn, label: 'LinkedIn' },
 ]
 
 const container = {

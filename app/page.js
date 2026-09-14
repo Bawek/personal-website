@@ -74,7 +74,7 @@ export default function Home() {
     image: aboutData?.hero?.imageUrl,
     sameAs: [
       'https://github.com/Bawek',
-      'https://www.linkedin.com/in/baweke-mekonnen-asres-60a426279/',
+      'https://www.linkedin.com/in/baweke/',
     ],
   })
 

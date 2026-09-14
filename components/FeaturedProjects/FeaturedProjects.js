@@ -52,7 +52,7 @@ export default function FeaturedProjects({ projects }) {
                       <span className="text-4xl font-bold text-white/10">{project.title?.charAt(0)}</span>
                     </div>
                   )}
-                  <div className="absolute inset-0 bg gradient-to-t from-[#0f0f17] via-transparent to-transparent opacity-60" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0f0f17] via-transparent to-transparent opacity-60" />
                   {project.featured && (
                     <div className="absolute top-3 right-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-amber-500/20 border border-amber-500/30 backdrop-blur-sm">
                       <HiStar size={12} className="text-amber-400" />

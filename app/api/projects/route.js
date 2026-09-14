@@ -21,7 +21,7 @@ async function handleGET(req) {
     }
 
     const projects = await Project.find(query).sort({ order: 1, createdAt: -1 })
-    return NextResponse.json(projects, { status: 200 })
+    return NextResponse.json({ projects }, { status: 200 })
   } catch (error) {
     console.error('Error fetching projects:', error)
     return NextResponse.json({ message: 'Error fetching projects' }, { status: 500 })

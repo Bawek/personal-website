@@ -27,10 +27,14 @@ export default function AdminLayout({ children, title }) {
   const router  = useRouter()
   const [open, setOpen]   = useState(false)
   const [user, setUser]   = useState(null)
+  const [siteUrl, setSiteUrl] = useState('')
 
   useEffect(() => {
     const u = localStorage.getItem('user')
     if (u) setUser(JSON.parse(u))
+    
+    // Set site URL from environment or current origin
+    setSiteUrl(process.env.NEXT_PUBLIC_BASE_URL || (typeof window !== 'undefined' ? window.location.origin : ''))
   }, [])
 
   const logout = () => {
@@ -94,10 +98,10 @@ export default function AdminLayout({ children, title }) {
         {/* User + actions */}
         <div className="p-3 border-t border-white/5 space-y-1 flex-shrink-0">
           <a
-            href="/"
+            href={process.env.NEXT_PUBLIC_BASE_URL || '/'}
             target="_blank"
             rel="noreferrer"
-            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-gray-500 hover:text-gray-300 hover:bg-white/5 transition-all"
+            className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-violet-400 hover:text-violet-300 hover:bg-violet-500/10 transition-all cursor-pointer"
           >
             <HiExternalLink size={16} aria-hidden="true" />
             View Site
@@ -142,10 +146,10 @@ export default function AdminLayout({ children, title }) {
           </div>
 
           <a
-            href="/"
+            href={siteUrl || '/'}
             target="_blank"
             rel="noreferrer"
-            className="hidden sm:flex items-center gap-1.5 text-xs text-gray-500 hover:text-violet-400 transition-colors font-mono"
+            className="hidden sm:flex items-center gap-1.5 text-xs text-violet-400 hover:text-violet-300 transition-colors font-mono cursor-pointer"
           >
             <HiExternalLink size={13} />
             View Site
