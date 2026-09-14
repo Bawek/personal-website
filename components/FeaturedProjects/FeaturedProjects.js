@@ -4,8 +4,9 @@ import { HiArrowRight, HiExternalLink, HiStar } from 'react-icons/hi'
 import { FaGithub } from 'react-icons/fa'
 
 export default function FeaturedProjects({ projects }) {
-  if (!projects || projects.length === 0) return null
-  const featured = projects.filter(p => p.featured).slice(0, 3)
+  const projectsArray = Array.isArray(projects) ? projects : (projects?.projects || [])
+  if (!projectsArray || projectsArray.length === 0) return null
+  const featured = projectsArray.filter(p => p.featured).slice(0, 3)
   if (featured.length === 0) return null
 
   return (

@@ -56,10 +56,10 @@ function DashboardContent() {
         api.get('/api/experience',{ headers }),
         api.get('/api/users',     { headers }),
       ])
-      const projects    = pR.status === 'fulfilled' ? pR.value.data || [] : []
-      const skills      = sR.status === 'fulfilled' ? sR.value.data || [] : []
-      const experiences = eR.status === 'fulfilled' ? eR.value.data || [] : []
-      const users       = uR.status === 'fulfilled' ? uR.value.data || [] : []
+      const projects    = pR.status === 'fulfilled' ? (Array.isArray(pR.value.data) ? pR.value.data : (pR.value.data.projects || [])) : []
+      const skills      = sR.status === 'fulfilled' ? (Array.isArray(sR.value.data) ? sR.value.data : (sR.value.data.skills || [])) : []
+      const experiences = eR.status === 'fulfilled' ? (Array.isArray(eR.value.data) ? eR.value.data : (eR.value.data.experience || [])) : []
+      const users       = uR.status === 'fulfilled' ? (Array.isArray(uR.value.data) ? uR.value.data : []) : []
       setStats({ totalProjects: projects.length, featuredProjects: projects.filter(p => p.featured).length, totalSkills: skills.length, totalExperience: experiences.length, totalUsers: users.length })
       setRecent(projects.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)).slice(0, 5))
       setLoading(false)

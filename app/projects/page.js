@@ -20,7 +20,10 @@ export default function ProjectsPage() {
         ])
 
         if (settingsRes.status === 'fulfilled') setSettings(settingsRes.value.data.settings)
-        if (projectsRes.status === 'fulfilled') setProjects(projectsRes.value.data.projects || [])
+        if (projectsRes.status === 'fulfilled') {
+          const projectsData = projectsRes.value.data
+          setProjects(Array.isArray(projectsData) ? projectsData : (projectsData.projects || []))
+        }
       } catch (err) {
         console.error('Error fetching data:', err)
       } finally {

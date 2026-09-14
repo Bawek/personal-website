@@ -11,7 +11,7 @@ export async function GET(req) {
   try {
     await connectDB()
     const experiences = await Experience.find().sort({ startDate: -1 })
-    return NextResponse.json(experiences, { status: 200 })
+    return NextResponse.json({ experience: experiences }, { status: 200 })
   } catch (error) {
     console.error('Experience fetch error:', error)
     return NextResponse.json(

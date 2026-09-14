@@ -42,13 +42,22 @@ export default function Home() {
         }
         if (aboutRes.status === 'fulfilled') setAboutData(aboutRes.value.data)
         if (contactRes.status === 'fulfilled') setContactData(contactRes.value.data)
-        if (skillsRes.status === 'fulfilled') setSkills(skillsRes.value.data.skills || [])
+        if (skillsRes.status === 'fulfilled') {
+          const skillsData = skillsRes.value.data
+          setSkills(Array.isArray(skillsData) ? skillsData : (skillsData.skills || []))
+        }
         else console.warn('Skills API failed:', skillsRes.reason)
         
-        if (projectsRes.status === 'fulfilled') setProjects(projectsRes.value.data.projects || [])
+        if (projectsRes.status === 'fulfilled') {
+          const projectsData = projectsRes.value.data
+          setProjects(Array.isArray(projectsData) ? projectsData : (projectsData.projects || []))
+        }
         else console.warn('Projects API failed:', projectsRes.reason)
         
-        if (experienceRes.status === 'fulfilled') setExperience(experienceRes.value.data.experience || [])
+        if (experienceRes.status === 'fulfilled') {
+          const experienceData = experienceRes.value.data
+          setExperience(Array.isArray(experienceData) ? experienceData : (experienceData.experience || []))
+        }
         else console.warn('Experience API failed:', experienceRes.reason)
       } catch (err) {
         console.error('Error fetching content:', err)

@@ -29,8 +29,9 @@ function ProjectsContent() {
   const fetchProjects = async () => {
     try {
       const { data } = await api.get('/api/projects', { headers: headers() })
-      setProjects(Array.isArray(data) ? data : [])
-      setFilteredProjects(Array.isArray(data) ? data : [])
+      const projectsArray = Array.isArray(data) ? data : (data.projects || [])
+      setProjects(projectsArray)
+      setFilteredProjects(projectsArray)
     } catch {
       setError('Failed to load projects')
     } finally {

@@ -24,8 +24,9 @@ const LEVEL_BAR = {
 }
 
 export default function FeaturedSkills({ skills }) {
-  if (!skills || skills.length === 0) return null
-  const topSkills = skills.slice(0, 6)
+  const skillsArray = Array.isArray(skills) ? skills : (skills?.skills || [])
+  if (!skillsArray || skillsArray.length === 0) return null
+  const topSkills = skillsArray.slice(0, 6)
 
   return (
     <section id="skills" className="py-24 relative overflow-hidden">

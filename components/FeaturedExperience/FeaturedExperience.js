@@ -19,8 +19,9 @@ const getTypeColor = (type) => {
 }
 
 export default function FeaturedExperience({ experience }) {
-  if (!experience || experience.length === 0) return null
-  const featured = experience.slice(0, 3)
+  const experienceArray = Array.isArray(experience) ? experience : (experience?.experience || [])
+  if (!experienceArray || experienceArray.length === 0) return null
+  const featured = experienceArray.slice(0, 3)
 
   return (
     <section id="experience" className="py-24 relative overflow-hidden">

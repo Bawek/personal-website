@@ -31,8 +31,9 @@ function ExperienceContent() {
 
   const fetchExperience = async () => {
     try {
-      const { data } = await api.get('/experience', { headers: headers() })
-      setExperiences(Array.isArray(data) ? data : [])
+      const { data } = await api.get('/api/experience', { headers: headers() })
+      const experienceArray = Array.isArray(data) ? data : (data.experience || [])
+      setExperiences(experienceArray)
     } catch (err) {
       console.error('Error fetching:', err)
       setError('Failed to load experience')

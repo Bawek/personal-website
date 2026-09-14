@@ -32,7 +32,8 @@ function SkillsContent() {
   const fetchSkills = async () => {
     try {
       const { data } = await api.get('/api/skills', { headers: headers() })
-      setSkills(data.skills || [])
+      const skillsArray = Array.isArray(data) ? data : (data.skills || [])
+      setSkills(skillsArray)
     } catch { setError('Failed to load skills') }
     finally { setLoading(false) }
   }
